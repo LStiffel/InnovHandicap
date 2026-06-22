@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Copie Miroir — entraînement clavier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+  
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <header>
+    <div class="subtitle">Lis le texte et recopie-le.</div>
+  </header>
+
+  <div class="legend" id="legend"></div>
+
+  <div class="card">
+    <h2 id="levelTitle">Niveau 1 — mini-confusions</h2>
+    <div class="target" id="target"></div>
+  </div>
+
+  <div class="card">
+    <input class="typebox" id="typebox" type="text" autocomplete="off" autocapitalize="off" spellcheck="false"
+      placeholder="Clique ici puis recopie le texte ci-dessus!">
+    <div class="row">
+      <button class="action ghost" id="nextBtn">Nouvelle phrase ↻</button>
+      <button class="action" id="validateBtn">Valider ✓</button>
+      <span class="timerline" id="timerline">⏱ 0.0 s</span>
+    </div>
+    <div class="feedback" id="feedback"></div>
+  </div>
+
+  <div class="card">
+    <h2>Résultats de la manche</h2>
+    <div class="stats">
+      <div class="stat"><div class="num" id="statTime">—</div><div class="label">secondes</div></div>
+      <div class="stat"><div class="num" id="statAcc">—</div><div class="label">précision des fautes</div></div>
+      <div class="stat"><div class="num" id="statWpm">—</div><div class="label">mots / min</div></div>
+    </div>
+  </div>
+
+  <footer>Astuce&nbsp;: les mots soulignés en vague rouge contiennent une faute volontaire — ne les corrige pas !</footer>
+</div>
+
+<script src="dyslexie.js" defer></script>
+</body>
+</html>

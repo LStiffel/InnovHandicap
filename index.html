@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Copie Miroir — entraînement clavier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FBF6EC;
+    --paper-line:#E7DEC9;
+    --ink:#2B2A3D;
+    --ink-soft:#6B6880;
+    --coral:#E2664B;
+    --moss:#5E8C6A;
+    --gold:#D9A23B;
+    --lilac:#8C7FB8;
+    --correct-bg:#DCEBDD;
+    --wrong-bg:#F6D6CE;
+    --radius:14px;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    background-image:
+      linear-gradient(var(--paper-line) 1px, transparent 1px);
+    background-size: 100% 2.4em;
+    color:var(--ink);
+    font-family:'Times new Roman', sans-serif;
+    min-height:100vh;
+    padding:32px 16px 60px;
+    display:flex;
+    justify-content:center;
+  }
+
+  .sheet{
+    max-width:760px;
+    width:100%;
+  }
+
+  header{
+    text-align:center;
+    margin-bottom:8px;
+  }
+
+  .brand{
+    display:inline-flex;
+    align-items:baseline;
+    gap:.15em;
+    font-family:'Caveat', cursive;
+    font-size:3rem;
+    font-weight:700;
+    line-height:1;
+  }
+  .brand .b{color:var(--coral); display:inline-block; transform:scaleX(-1);}
+  .brand .b.flip-d{color:var(--lilac); transform:scaleX(1);}
+
+  .subtitle{
+    color:var(--ink-soft);
+    font-size:1rem;
+    margin-top:2px;
+  }
+
+  .legend{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    justify-content:center;
+    margin:18px 0 22px;
+  }
+  .chip{
+    border:2px solid var(--ink);
+    border-radius:999px;
+    padding:4px 12px;
+    font-size:.85rem;
+    font-weight:700;
+    background:#fff;
+    cursor:pointer;
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .chip.active{
+    background:var(--ink);
+    color:var(--paper);
+    transform:translateY(-2px);
+    box-shadow:0 3px 0 var(--coral);
+  }
+
+  .card{
+    background:#fff;
+    border:2px solid var(--ink);
+    border-radius:var(--radius);
+    box-shadow:6px 6px 0 var(--ink);
+    padding:28px 26px;
+    margin-bottom:22px;
+  }
+
+  .card h2{
+    margin:0 0 14px;
+    font-family:'Caveat', cursive;
+    font-size:1.6rem;
+    color:var(--ink-soft);
+  }
+
+  .target{
+    font-size:1.45rem;
+    line-height:2.3;
+    letter-spacing:.01em;
+    word-spacing:.15em;
+    min-height:3.5em;
+  }
+  .target span.trap:hover::after{
+    content: attr(data-hint);
+    position:absolute;
+    left:50%;
+    bottom:120%;
+    transform:translateX(-50%);
+    background:var(--ink);
+    color:var(--paper);
+    padding:4px 9px;
+    border-radius:8px;
+    font-size:.75rem;
+    white-space:nowrap;
+    font-family:'Atkinson Hyperlegible', sans-serif;
+  }
+  .target .ch{ transition: background .08s ease; border-radius:3px; }
+  .target .ch.correct{ background:var(--correct-bg); }
+  .target .ch.wrong{ background:var(--wrong-bg); }
+  .target .ch.current{ outline:2px solid var(--gold); outline-offset:-1px; }
+
+  .typebox{
+    width:100%;
+    font-family:'Atkinson Hyperlegible', sans-serif;
+    font-size:1.3rem;
+    padding:14px 16px;
+    border:2px solid var(--ink);
+    border-radius:10px;
+    background:var(--paper);
+    color:var(--ink);
+    outline:none;
+  }
+  .typebox:focus{ border-color: var(--lilac); }
+  .typebox.locked{ background:#eee; color:#999; }
+
+  .row{
+    display:flex;
+    gap:12px;
+    margin-top:14px;
+    flex-wrap:wrap;
+    align-items:center;
+  }
+
+  button.action{
+    border:2px solid var(--ink);
+    background:var(--gold);
+    color:var(--ink);
+    font-weight:700;
+    font-family:'Atkinson Hyperlegible', sans-serif;
+    padding:10px 18px;
+    border-radius:10px;
+    cursor:pointer;
+    box-shadow:3px 3px 0 var(--ink);
+    transition:transform .1s ease, box-shadow .1s ease;
+  }
+  button.action:hover{ transform:translate(1px,1px); box-shadow:2px 2px 0 var(--ink); }
+  button.action.ghost{ background:#fff; }
+
+  .timerline{
+    font-family:'Caveat', cursive;
+    font-size:1.3rem;
+    color:var(--ink-soft);
+  }
+
+  .stats{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+    text-align:center;
+  }
+  .stat .num{
+    font-size:2.2rem;
+    font-family:'Caveat', cursive;
+    font-weight:700;
+    color:var(--moss);
+  }
+  .stat .num.bad{ color:var(--coral); }
+  .stat .label{
+    font-size:.8rem;
+    color:var(--ink-soft);
+    text-transform:uppercase;
+    letter-spacing:.05em;
+  }
+
+  .feedback{
+    margin-top:10px;
+    font-size:.95rem;
+    color:var(--ink-soft);
+    min-height:1.4em;
+  }
+
+  footer{
+    text-align:center;
+    color:var(--ink-soft);
+    font-size:.8rem;
+    margin-top:10px;
+  }
+
+  @media (max-width: 480px){
+    .target{ font-size:1.15rem; }
+    .brand{ font-size:2.2rem; }
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <header>
+    <div class="subtitle">Lis le texte et recopie-le.</div>
+  </header>
+
+  <div class="legend" id="legend"></div>
+
+  <div class="card">
+    <h2 id="levelTitle">Niveau 1 — mini-confusions</h2>
+    <div class="target" id="target"></div>
+  </div>
+
+  <div class="card">
+    <input class="typebox" id="typebox" type="text" autocomplete="off" autocapitalize="off" spellcheck="false"
+      placeholder="Clique ici puis recopie le texte ci-dessus!">
+    <div class="row">
+      <button class="action ghost" id="nextBtn">Nouvelle phrase ↻</button>
+      <button class="action" id="validateBtn">Valider ✓</button>
+      <span class="timerline" id="timerline">⏱ 0.0 s</span>
+    </div>
+    <div class="feedback" id="feedback"></div>
+  </div>
+
+  <div class="card">
+    <h2>Résultats de la manche</h2>
+    <div class="stats">
+      <div class="stat"><div class="num" id="statTime">—</div><div class="label">secondes</div></div>
+      <div class="stat"><div class="num" id="statAcc">—</div><div class="label">précision des fautes</div></div>
+      <div class="stat"><div class="num" id="statWpm">—</div><div class="label">mots / min</div></div>
+    </div>
+  </div>
+
+  <footer>Astuce&nbsp;: les mots soulignés en vague rouge contiennent une faute volontaire — ne les corrige pas !</footer>
+</div>
+
+<script>
+// ---------- Banque de phrases (fautes typiques volontaires) ----------
+// Marquage : [[mot]] = mot contenant une faute volontaire (affiché tel quel).
+// type indique la nature de la confusion pour la légende pédagogique.
+const LEVELS = [
+  {
+    name: "Niveau 1 — confusions miroir (b/d, p/q)",
+    types: ["b/d", "p/q"],
+    sentences: [
+      { text: "Le [[qetit]] chien dort sous le lit.", hints:{qetit:"petit (p→q)"} },
+      { text: "Mon papa [[doit]] du café le matin.", hints:{doit:"boit (b→d)"} },
+      { text: "La [[dalle]] rebondit sur le mur.", hints:{dalle:"balle (b→d)"} },
+      { text: "Je dessine un [[dateau]] sur la mer.", hints:{dateau:"bateau (b→d)"} },
+      { text: "Il pleut [[deaucoup]] ce matin.", hints:{deaucoup:"beaucoup (b→d)"} },
+      { text: "Elle mange une [[qomme]] verte.", hints:{qomme:"pomme (p→q)"} },
+    ]
+  },
+  {
+    name: "Niveau 2 — substitutions phonétiques (ph/f, gue/ge)",
+    types: ["ph/f", "gue/ge", "b/d", "p/q"],
+    sentences: [
+      { text: "Le [[téléfone]] sonne dans la cuisine.", hints:{téléfone:"téléphone (ph→f)"} },
+      { text: "Maman porte une [[bage]] en or.", hints:{bage:"bague (gue→ge)"} },
+      { text: "Nous prenons une [[foto]] devant l'école.", hints:{foto:"photo (ph→f)"} },
+      { text: "Le chat est très [[fatige]] ce soir.", hints:{fatige:"fatigué (gue→ge)"} },
+      { text: "Va chercher le sirop à la [[farmacie]].", hints:{farmacie:"pharmacie (ph→f)"} },
+      { text: "Le bébé [[qarle]] déjà un peu.", hints:{qarle:"parle (p→q)"} },
+    ]
+  },
+  {
+    name: "Niveau 3 — phrases longues, fautes multiples",
+    types: ["b/d", "p/q", "ph/f", "gue/ge"],
+    sentences: [
+      { text: "Mon [[qapa]] a acheté un [[téléfone]] et une [[bage]] en or [[qour]] maman.",
+        hints:{qapa:"papa (p→q)", téléfone:"téléphone (ph→f)", bage:"bague (gue→ge)", qour:"pour (p→q)"} },
+      { text: "Le [[dauphin]] [[saute]] dans l'eau et nage [[avec]] son [[ami]].",
+        hints:{} },
+      { text: "[[Quand]] il fait [[deau]], on [[qart]] [[se]] [[qromener]] dans le [[qarc]].",
+        hints:{deau:"beau (b→d)", qart:"part (p→q)", qromener:"promener (p→q)", qarc:"parc (p→q)"} },
+      { text: "La [[dibliothèque]] [[qrête]] des livres sur les [[dolphins]] et la [[gégraphie]].",
+        hints:{dibliothèque:"bibliothèque (b→d)", qrête:"prête (p→q)", dolphins:"dauphins (b→d)", gégraphie:"géographie (gue→ge)"} },
+    ]
+  }
+];
+
+// ---------- État du jeu ----------
+let levelIndex = 0;
+let currentSentence = null;
+let targetPlain = "";       // texte cible exact à retrouver (sans les marqueurs [[ ]])
+let traps = [];             // liste {word, start, end, hint}
+let startTime = null;
+let finished = false;
+
+const legendEl = document.getElementById('legend');
+const levelTitleEl = document.getElementById('levelTitle');
+const targetEl = document.getElementById('target');
+const typebox = document.getElementById('typebox');
+const timerlineEl = document.getElementById('timerline');
+const feedbackEl = document.getElementById('feedback');
+const statTime = document.getElementById('statTime');
+const statAcc = document.getElementById('statAcc');
+const statWpm = document.getElementById('statWpm');
+
+let timerInterval = null;
+
+function buildLegend(){
+  legendEl.innerHTML = "";
+  LEVELS.forEach((lvl, i) => {
+    const chip = document.createElement('button');
+    chip.className = 'chip' + (i === levelIndex ? ' active' : '');
+    chip.textContent = (i+1) + ". " + lvl.types.join(' · ');
+    chip.onclick = () => { levelIndex = i; pickSentence(); };
+    legendEl.appendChild(chip);
+  });
+}
+
+function parseSentence(raw, hints){
+  // Transforme "Le [[qetit]] chien" en texte plein + liste de traps avec positions
+  let plain = "";
+  let foundTraps = [];
+  let i = 0;
+  while (i < raw.length){
+    if (raw[i] === '[' && raw[i+1] === '['){
+      const end = raw.indexOf(']]', i);
+      const word = raw.slice(i+2, end);
+      foundTraps.push({ start: plain.length, end: plain.length + word.length, word, hint: hints[word] || "faute volontaire" });
+      plain += word;
+      i = end + 2;
+    } else {
+      plain += raw[i];
+      i++;
+    }
+  }
+  return { plain, foundTraps };
+}
+
+function pickSentence(){
+  buildLegend();
+  const lvl = LEVELS[levelIndex];
+  levelTitleEl.textContent = "Niveau " + (levelIndex+1) + " — " + lvl.name.split('—')[1].trim();
+  const pool = lvl.sentences;
+  currentSentence = pool[Math.floor(Math.random() * pool.length)];
+  const { plain, foundTraps } = parseSentence(currentSentence.text, currentSentence.hints || {});
+  targetPlain = plain;
+  traps = foundTraps;
+  finished = false;
+  startTime = null;
+  clearInterval(timerInterval);
+  timerlineEl.textContent = "⏱ 0.0 s";
+  typebox.value = "";
+  typebox.classList.remove('locked');
+  typebox.disabled = false;
+  feedbackEl.textContent = "";
+  statTime.textContent = "—"; statAcc.textContent = "—"; statWpm.textContent = "—";
+  statAcc.classList.remove('bad'); statWpm.classList.remove('bad');
+  renderTarget("");
+  typebox.focus();
+}
+
+function isInTrap(idx){
+  return traps.find(t => idx >= t.start && idx < t.end);
+}
+
+function renderTarget(typed){
+  let html = "";
+  for (let i = 0; i < targetPlain.length; i++){
+    const ch = targetPlain[i];
+    const trap = isInTrap(i);
+    let cls = "ch";
+    if (i < typed.length){
+      cls += (typed[i] === ch) ? " correct" : " wrong";
+    } else if (i === typed.length){
+      cls += " current";
+    }
+    const safe = ch === ' ' ? '&nbsp;' : ch.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+
+    if (trap && trap.start === i){
+      html += `<span class="trap" data-hint="${trap.hint.replace(/"/g,'&quot;')}">`;
+    }
+    html += `<span class="${cls}">${safe}</span>`;
+    if (trap && trap.end === i + 1){
+      html += `</span>`;
+    }
+  }
+  targetEl.innerHTML = html;
+}
+
+function startTimerIfNeeded(){
+  if (startTime === null){
+    startTime = Date.now();
+    timerInterval = setInterval(() => {
+      const s = (Date.now() - startTime) / 1000;
+      timerlineEl.textContent = "⏱ " + s.toFixed(1) + " s";
+    }, 100);
+  }
+}
+
+function finishRound(){
+  if (finished) return;
+  finished = true;
+  clearInterval(timerInterval);
+  const elapsedSec = startTime ? (Date.now() - startTime) / 1000 : 0;
+  typebox.disabled = true;
+  typebox.classList.add('locked');
+
+  const typed = typebox.value;
+  let correctChars = 0;
+  const len = Math.max(typed.length, targetPlain.length);
+  for (let i = 0; i < targetPlain.length; i++){
+    if (typed[i] === targetPlain[i]) correctChars++;
+  }
+  const accuracy = targetPlain.length ? Math.round((correctChars / targetPlain.length) * 100) : 0;
+  const minutes = elapsedSec / 60;
+  const wpm = minutes > 0 ? Math.round((targetPlain.length / 5) / minutes) : 0;
+
+  statTime.textContent = elapsedSec.toFixed(1);
+  statAcc.textContent = accuracy + "%";
+  statWpm.textContent = wpm;
+
+  if (accuracy < 70) statAcc.classList.add('bad'); else statAcc.classList.remove('bad');
+
+  // Vérifie si les fautes volontaires ont bien été reproduites (pas "corrigées")
+  let trapsKept = 0;
+  traps.forEach(t => {
+    const typedWord = typed.slice(t.start, t.end);
+    if (typedWord === t.word) trapsKept++;
+  });
+  const trapMsg = traps.length
+    ? `Tu as conservé ${trapsKept}/${traps.length} faute(s) volontaire(s) — ${trapsKept === traps.length ? "bravo, aucune n'a été corrigée par réflexe !" : "attention, ton cerveau a corrigé certaines fautes automatiquement !"}`
+    : "";
+  feedbackEl.textContent = accuracy === 100
+    ? "Texte recopié à l'identique, fautes comprises. " + trapMsg
+    : "Compare les zones colorées ci-dessus pour repérer les écarts. " + trapMsg;
+}
+
+typebox.addEventListener('input', () => {
+  startTimerIfNeeded();
+  renderTarget(typebox.value);
+  if (!finished && typebox.value.length >= targetPlain.length){
+    finishRound();
+  }
+});
+
+typebox.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') finishRound();
+});
+
+document.getElementById('validateBtn').onclick = finishRound;
+document.getElementById('nextBtn').onclick = pickSentence;
+
+pickSentence();
+</script>
+</body>
+</html>
