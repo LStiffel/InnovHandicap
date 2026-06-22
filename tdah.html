@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapitre 3 — Le TDAH · Inov'Handicap</title>
+<meta name="description" content="Mini-jeu de sensibilisation au TDAH : comprendre le déficit d'attention à travers une simulation interactive.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="sheet">
+
+  <header>
+    <div class="brand">
+      Inov'<span class="b">H</span>an<span class="b flip-d">d</span>icap
+    </div>
+    <div class="subtitle">Chapitre 3 — Le TDAH : l'attention capturée</div>
+  </header>
+
+  <!-- ===== CONSIGNE ===== -->
+  <div class="card" id="tdahInstructions">
+    <h2>🧠 Règle du jeu</h2>
+    <p class="tdah-intro-text">
+      Des animaux vont apparaître à l'écran. Tu dois cliquer <strong>uniquement sur les crabes</strong> 🦀 pour marquer des points.<br>
+      Mais attention… ton attention va être <em>capturée</em> par des distractions ! Des zooms involontaires vont te détourner de ta tâche.<br><br>
+      <strong>Tu as 30 secondes.</strong> Bonne chance !
+    </p>
+    <div class="row">
+      <button class="action" id="tdahStartBtn">Commencer ▶</button>
+      <span class="tdah-legend-animals">
+        🦀 = cliquer &nbsp;|&nbsp; 🐠🐸🐙 = ne pas cliquer
+      </span>
+    </div>
+  </div>
+
+  <!-- ===== ARÈNE DE JEU ===== -->
+  <div id="tdahArena" style="display:block;">
+    <div class="card tdah-arena-card">
+      <div class="row" style="justify-content:space-between; margin-top:0; margin-bottom:10px;">
+        <span class="timerline" id="tdahTimer">⏱ 30.0 s</span>
+        <span class="timerline" id="tdahScore">🦀 0 pts</span>
+        <button class="action ghost" id="tdahStopBtn" style="display:none;" title="Arrêter la simulation (Échap)">⛔ Stop</button>
+      </div>
+      <div class="tdah-grid" id="tdahGrid">
+        <!-- Les animaux apparaissent ici dynamiquement -->
+        <div class="tdah-overlay" id="tdahOverlay"></div>
+      </div>
+      <div class="tdah-zoom-label" id="tdahZoomLabel"></div>
+    </div>
+  </div>
+
+  <!-- ===== RÉSULTATS ===== -->
+  <div id="tdahResults" style="display:none;">
+    <div class="card">
+      <h2>Résultats de la partie</h2>
+      <div class="stats">
+        <div class="stat"><div class="num" id="statCrabs">—</div><div class="label">crabes attrapés</div></div>
+        <div class="stat"><div class="num" id="statBad">—</div><div class="label">mauvais clics</div></div>
+        <div class="stat"><div class="num" id="statScore">—</div><div class="label">score final</div></div>
+      </div>
+      <div class="feedback" id="tdahFeedback">
+        Les zooms involontaires t'ont empêché de te concentrer ? C'est exactement ce que vit une personne atteinte de TDAH au quotidien.
+      </div>
+      <div class="row">
+        <button class="action ghost" id="tdahReplayBtn">Rejouer ↻</button>
+        <button class="action" id="tdahShowExplBtn">Comprendre le TDAH →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== FICHE PÉDAGOGIQUE ===== -->
+  <div id="tdahExplanation" style="display:none;">
+    <div class="card tdah-expl-card">
+      <h2>🧠 Qu'est-ce que le TDAH ?</h2>
+      <div class="tdah-expl-content">
+        <div class="tdah-expl-block">
+          <h3>Définition</h3>
+          <p>
+            Le <strong>TDAH</strong> (Trouble du Déficit de l'Attention avec ou sans Hyperactivité)
+            est un <strong>trouble du neurodéveloppement</strong>. Il affecte la capacité à maintenir 
+            son attention, à contrôler ses impulsions et parfois à gérer son niveau d'activité.
+          </p>
+        </div>
+
+        <div class="tdah-expl-block">
+          <h3>📊 Chiffres clés</h3>
+          <ul>
+            <li><strong>5 à 7 %</strong> des enfants et adolescents sont concernés</li>
+            <li><strong>3 %</strong> de la population adulte vit avec un TDAH</li>
+            <li>Le TDAH est souvent <strong>diagnostiqué tardivement</strong>, surtout chez les filles</li>
+          </ul>
+        </div>
+
+        <div class="tdah-expl-block">
+          <h3>💡 Ce qu'il faut retenir</h3>
+          <p class="tdah-expl-quote">
+            « Ce n'est pas de la mauvaise volonté, c'est un cerveau qui fonctionne différemment. »
+          </p>
+          <p>
+            Une personne avec un TDAH ne choisit pas de ne pas écouter. Son cerveau est 
+            littéralement <strong>"capturé"</strong> par les stimuli environnants — exactement 
+            comme les zooms que tu as subis pendant le jeu. L'effort nécessaire pour 
+            rester concentré est beaucoup plus grand.
+          </p>
+        </div>
+
+        <div class="tdah-expl-block">
+          <h3>🤝 Comment aider ?</h3>
+          <ul>
+            <li>Être patient et bienveillant</li>
+            <li>Donner des consignes courtes et claires</li>
+            <li>Limiter les distractions dans l'environnement</li>
+            <li>Encourager plutôt que punir</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="row">
+        <button class="action ghost" id="tdahReplayBtn2">Rejouer ↻</button>
+        <a href="index.html" class="action" style="text-decoration:none; display:inline-block;">Retour au menu</a>
+        <!-- <a href="daltonisme.html" class="action" style="text-decoration:none; display:inline-block;">Chapitre suivant →</a> -->
+      </div>
+    </div>
+  </div>
+
+  <footer>Astuce&nbsp;: appuie sur <kbd>Échap</kbd> pour arrêter la simulation à tout moment.</footer>
+</div>
+
+<script src="tdah.js" defer></script>
+</body>
+</html>
