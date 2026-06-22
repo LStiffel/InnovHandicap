@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dans la Peau d'un Dyspraxique</title>
+  <link rel="stylesheet" href="style-dyspraxie.css">
+
+</head>
+<body>
+
+  <!-- ====================================================
+       ÉCRAN 1 — ACCUEIL
+  ==================================================== -->
+  <section id="screen-accueil" class="screen active">
+    <div class="accueil-inner">
+
+      <span class="accueil-hero-icon">🎒</span>
+
+      <h1>Dans la peau<br>d'un <span>Dyspraxique</span></h1>
+
+      <p class="tagline">
+        Prépare ton cartable… mais ton corps refuse de t'obéir.<br>
+        Vis quelques instants dans le quotidien de ceux dont
+        les gestes ne répondent jamais comme prévu.
+      </p>
+
+      <div class="accueil-warning">
+        ⚠️ <strong>Attention :</strong> Le curseur va se comporter de façon
+        volontairement étrange — c'est entièrement voulu et fait partie de
+        l'expérience ! Ne cherche pas à réparer ton ordinateur. 😄
+      </div>
+
+      <button class="btn btn-primary" onclick="goTo('jeu')">
+        ▶&nbsp; Commencer l'expérience
+      </button>
+
+    </div>
+  </section>
+
+
+  <!-- ====================================================
+       ÉCRAN 2 — JEU
+  ==================================================== -->
+  <section id="screen-jeu" class="screen">
+
+    <!-- Bandeau supérieur : chronomètre + consigne -->
+    <div class="jeu-hud">
+      <div class="chrono-pill">
+        <span class="chrono-icon">⏱️</span>
+        <span id="chrono-display">00:00</span>
+      </div>
+      <div class="hud-tip">
+        📋 Glisse les 3 bons livres dans le cartable →
+      </div>
+    </div>
+
+    <!-- Grille en 3 colonnes -->
+    <div class="jeu-layout">
+
+      <!-- Colonne gauche : liste de tâches -->
+      <div class="task-panel">
+        <div class="panel-title">📋 À ranger :</div>
+        <div id="task-list"><!-- Rempli par JS --></div>
+      </div>
+
+      <!-- Colonne centrale : tas de livres -->
+      <div class="books-zone">
+        <div class="panel-title">📚 Tes livres :</div>
+        <!--
+          Les livres sont positionnés en "absolute" dans ce conteneur.
+          Le conteneur lui-même est en "relative" → il sert de repère.
+        -->
+        <div id="books-container"><!-- Rempli par JS --></div>
+      </div>
+
+      <!-- Colonne droite : cartable -->
+      <div class="bag-panel">
+        <div class="panel-title">🎒 Cartable :</div>
+        <div class="bag-dropzone" id="bag-dropzone">
+          <div class="bag-dropzone-header">
+            <span class="bag-big-emoji">🎒</span>
+            <span class="bag-drop-hint">Dépose tes livres ici</span>
+          </div>
+          <!-- Les tags des livres déposés s'ajoutent ici -->
+          <div id="bag-contents"><!-- Rempli par JS --></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ====================================================
+       ÉCRAN 3 — DEVINE LE TROUBLE
+  ==================================================== -->
+  <section id="screen-devine" class="screen">
+
+    <div class="card devine-card">
+      <h2>🤔 Selon toi…</h2>
+      <p class="devine-sub">
+        Quel trouble neurologique venais-tu de simuler ?
+      </p>
+
+      <!-- Grille des choix — remplie dynamiquement par JS -->
+      <div class="troubles-grid" id="troubles-grid"></div>
+
+      <button
+        class="btn btn-success"
+        id="btn-valider"
+        onclick="validerReponse()"
+        disabled
+      >
+        ✅&nbsp; Valider ma réponse
+      </button>
+    </div>
+
+  </section>
+
+
+  <!-- ====================================================
+       ÉCRAN 4 — SCORE & EXPLICATION
+  ==================================================== -->
+  <section id="screen-score" class="screen">
+
+    <div class="score-card card">
+
+      <h2>🏁 Résultats</h2>
+
+      <!-- Bandeau score (nombre animé) -->
+      <div class="score-banner">
+        <div class="score-number" id="score-final-display">0</div>
+        <div class="score-pts">points</div>
+        <div class="score-details">
+          <div class="score-chip" id="chip-temps">⏱️ Temps : —</div>
+          <div class="score-chip" id="chip-bonus">🧠 Identification : —</div>
+        </div>
+      </div>
+
+      <!-- Badge bonne/mauvaise réponse -->
+      <div id="result-badge-zone" style="margin-bottom:20px;"></div>
+
+      <!-- Bloc pédagogique -->
+      <div class="explication-box">
+        <h3>📖 La Dyspraxie, c'est quoi ?</h3>
+        <p id="explication-texte"><!-- Rempli par JS depuis la constante --></p>
+        <p class="explication-source" id="explication-source-texte"></p>
+      </div>
+
+      <button class="btn btn-accent" onclick="rejouer()">
+        🔄&nbsp; Rejouer
+      </button>
+
+    </div>
+
+  </section>
+
+
+  <!-- ====================================================
+       JAVASCRIPT
+  ==================================================== -->
+  <script>
+
+  /* ======================================================
+     ===== CONFIGURATION — Modifie ces valeurs librement ==
+     ====================================================== */
+
+  /**
+   * Liste des troubles affichés à l'écran 3.
+   * Ajoute ou retire des entrées facilement.
+   * Chaque entrée : { nom: string, emoji: string }
+   */
+  const TROUBLES = [
+    { nom: "Dyslexie",        emoji: "📖" },
+    { nom: "Dyscalculie",     emoji: "🔢" },
+    { nom: "Dysgraphie",      emoji: "✍️" },
+    { nom: "Dyspraxie",       emoji: "🤲" },   // ← bonne réponse
+    { nom: "Dysorthographie", emoji: "🔤" },
+    { nom: "TDA/H",           emoji: "⚡" },
+  ];
+
+  /**
+   * Nom exact du trouble simulé.
+   * Doit correspondre au champ "nom" d'une entrée dans TROUBLES.
+   */
+  const TROUBLE_CORRECT = "Dyspraxie";
+
+  /**
+   * Livres que le joueur DOIT ranger dans le cartable pour gagner.
+   * Les noms doivent correspondre exactement à TOUS_LES_LIVRES ci-dessous.
+   */
+  const LIVRES_REQUIS = ["Maths", "Français", "Histoire"];
+
+  /**
+   * Tous les livres affichés dans le tas.
+   * couleur : couleur CSS de la couverture
+   * emoji   : icône affiché sur le livre
+   */
+  const TOUS_LES_LIVRES = [
+    { nom: "Maths",       couleur: "#4a6fa5", emoji: "📐" },
+    { nom: "Français",    couleur: "#7b5ea7", emoji: "📝" },
+    { nom: "Histoire",    couleur: "#b05a3a", emoji: "🏛️" },
+    { nom: "Sciences",    couleur: "#3a9b72", emoji: "🔬" },
+    { nom: "Géographie",  couleur: "#2e7d8b", emoji: "🌍" },
+    { nom: "Technologie", couleur: "#5a6fcf", emoji: "⚙️" },
+    { nom: "Musique",     couleur: "#a05aaa", emoji: "🎵" },
+    { nom: "Anglais",     couleur: "#c87c35", emoji: "🇬🇧" },
+  ];
+
+  /** Score maximum accordé pour la vitesse */
+  const SCORE_TEMPS_MAX = 1000;
+
+  /** Points perdus par seconde (plus élevé = plus punitif) */
+  const PENALITE_PAR_SECONDE = 12;
+
+  /** Bonus si le joueur identifie correctement le trouble */
+  const BONUS_IDENTIFICATION = 300;
+
+  /**
+   * Texte pédagogique affiché à l'écran 4.
+   * Utilise des sauts de ligne (\n\n) pour créer des paragraphes.
+   * Le CSS white-space:pre-line les respecte.
+   */
+  const EXPLICATION_TROUBLE = `La dyspraxie (officiellement appelée Trouble Développemental de la Coordination – TDC) est un trouble neurologique qui affecte la planification, la coordination et l'exécution des gestes intentionnels.
+
+Contrairement à ce qu'on pourrait croire, elle n'a aucun lien avec l'intelligence. Une personne dyspraxique peut être brillante intellectuellement tout en trouvant épuisant d'écrire, de s'habiller, de ranger ses affaires ou de pratiquer un sport.
+
+En France, environ 5 à 7 % des élèves seraient concernés. Beaucoup passent des années sans diagnostic, souvent perçus à tort comme "maladroits", "désorganisés" ou "peu motivés".
+
+Avec des aménagements adaptés — temps supplémentaire, outils numériques, bienveillance du corps enseignant — les élèves dyspraxiques peuvent pleinement réussir leur scolarité et s'épanouir.`;
+
+  /** Petit crédit affiché sous l'explication */
+  const EXPLICATION_SOURCE = "Source : Fédération Française des DYS (ffdys.com) — Inserm 2023";
+
+  /* ======================================================
+     ===== ÉTAT INTERNE DU JEU ============================
+     ====================================================== */
+
+  /** Nombres de secondes écoulées depuis le début du jeu */
+  let secondes = 0;
+
+  /** Référence à l'intervalle du chronomètre (pour pouvoir l'arrêter) */
+  let chronoInterval = null;
+
+  /** Noms des livres actuellement dans le cartable */
+  let livresDansCartable = [];
+
+  /** Réponse sélectionnée à l'écran 3 */
+  let reponseJoueur = null;
+
+  /** Temps (en secondes) au moment où le jeu se termine */
+  let tempsFinale = 0;
+
+  /* --- Variables de la mécanique de drag --- */
+
+  /** L'élément DOM du livre en cours de glissement (ou null) */
+  let livreEnDrag = null;
+
+  /**
+   * Décalage entre le point de clic et le coin haut-gauche du livre.
+   * Calculé au mousedown pour que le livre ne "saute" pas sous le curseur.
+   */
+  let clickOffsetX = 0;
+  let clickOffsetY = 0;
+
+  /**
+   * Position CIBLE du livre (là où le curseur veut qu'il aille).
+   * Mise à jour à chaque mousemove.
+   */
+  let targetX = 0;
+  let targetY = 0;
+
+  /**
+   * Position ACTUELLE du livre (lissée vers targetX/Y par interpolation).
+   * C'est ce qui est réellement appliqué au style left/top.
+   */
+  let currentX = 0;
+  let currentY = 0;
+
+  // Position de la souris à la FRAME PRÉCÉDENTE
+  // (pour calculer le delta de déplacement)
+  let prevMouseX = 0;
+  let prevMouseY = 0;
+
+  // Position de la souris à la FRAME COURANTE
+  let mouseX = 0;
+  let mouseY = 0;
+  /**
+   * Force statique parasite appliquée au livre quand on l'attrape.
+   * Représente la "déviation initiale" : le livre part dans une direction
+   * aléatoire orientée vers la gauche, et la target doit contrebalancer.
+   */
+  let forceStatX = 0;
+  let forceStatY = 0;
+
+  /** Handle du requestAnimationFrame (pour pouvoir l'annuler) */
+  let rafId = null;
+
+  /* ======================================================
+     ===== NAVIGATION ENTRE ÉCRANS ========================
+     ====================================================== */
+
+  /**
+   * Affiche l'écran dont l'id est passé en paramètre
+   * et masque tous les autres.
+   * @param {'accueil'|'jeu'|'devine'|'score'} id
+   */
+  function goTo(id) {
+    // Masque tous les écrans
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+
+    // Affiche le bon écran
+    const el = document.getElementById('screen-' + id);
+    el.classList.add('active');
+
+    // Actions d'initialisation spécifiques à chaque écran
+    if (id === 'jeu')    initJeu();
+    if (id === 'devine') initDevine();
+    if (id === 'score')  initScore();
+  }
+
+  /* ======================================================
+     ===== ÉCRAN 2 — INITIALISATION DU JEU ===============
+     ====================================================== */
+
+  function initJeu() {
+    // Réinitialise l'état
+    livresDansCartable = [];
+    secondes           = 0;
+    reponseJoueur      = null;
+    tempsFinale        = 0;
+
+    stopChrono();
+    cancelAnimationFrame(rafId);
+    livreEnDrag = null;
+
+    // Vide les zones HTML dynamiques
+    document.getElementById('task-list').innerHTML    = '';
+    document.getElementById('books-container').innerHTML = '';
+    document.getElementById('bag-contents').innerHTML    = '';
+    document.getElementById('chrono-display').textContent = '00:00';
+    document.getElementById('bag-dropzone').classList.remove('over');
+
+    // ---- Construit la liste de tâches ----
+    const taskList = document.getElementById('task-list');
+
+    LIVRES_REQUIS.forEach(nom => {
+      const div = document.createElement('div');
+      div.className  = 'task-item';
+      div.id         = 'task-' + cssId(nom);
+      div.innerHTML  = `
+        <div class="task-check">✓</div>
+        <span class="task-label">${nom}</span>
+      `;
+      taskList.appendChild(div);
+    });
+
+    // ---- Place les livres aléatoirement dans le tas ----
+    const container = document.getElementById('books-container');
+
+    // Dimensions de la zone de placement
+    // On lit la largeur réelle, mais on utilise une hauteur fixe (cf CSS)
+    const zoneW = container.offsetWidth  || 400;
+    const zoneH = 300; // correspond au height CSS de #books-container
+
+    TOUS_LES_LIVRES.forEach(data => {
+      // Position aléatoire (on laisse une marge pour que le livre reste visible)
+      const x = 10 + Math.random() * (zoneW - 90);
+      const y = 10 + Math.random() * (zoneH - 105);
+
+      const div = document.createElement('div');
+      div.className = 'book';
+      div.id        = 'book-' + cssId(data.nom);
+      div.dataset.nom = data.nom;
+      div.style.backgroundColor = data.couleur;
+      div.style.left = x + 'px';
+      div.style.top  = y + 'px';
+      div.innerHTML  = `
+        <span class="book-emoji">${data.emoji}</span>
+        ${data.nom}
+      `;
+
+      // Attache les listeners de drag (souris + tactile)
+      div.addEventListener('mousedown',  onBookMouseDown);
+      div.addEventListener('touchstart', onBookTouchStart, { passive: false });
+
+      container.appendChild(div);
+    });
+
+    // ---- Démarre le chronomètre ----
+    startChrono();
+  }
+
+  /* ======================================================
+     ===== CHRONOMÈTRE ====================================
+     ====================================================== */
+
+  function startChrono() {
+    stopChrono();
+    secondes = 0;
+    afficherChrono(0);
+    chronoInterval = setInterval(() => {
+      secondes++;
+      afficherChrono(secondes);
+    }, 1000);
+  }
+
+  function stopChrono() {
+    if (chronoInterval) {
+      clearInterval(chronoInterval);
+      chronoInterval = null;
+    }
+  }
+
+  /** Formate les secondes en MM:SS et met à jour l'affichage */
+  function afficherChrono(s) {
+    const mm = String(Math.floor(s / 60)).padStart(2, '0');
+    const ss = String(s % 60).padStart(2, '0');
+    document.getElementById('chrono-display').textContent = mm + ':' + ss;
+  }
+
+  /* ======================================================
+     ===== MÉCANIQUE DE DRAG & DROP =======================
+
+     Principe :
+       1. mousedown  → mémorise le livre, calcule offsets, applique
+                       la "force_initiale" parasite, lance la boucle RAF
+       2. mousemove  → met à jour targetX/Y (position désirée)
+       3. RAF loop   → interpole currentX/Y vers targetX/Y (inertie)
+                       + ajoute le tremblement
+                       + soustrait la force statique (résistance)
+       4. mouseup    → arrête le RAF, teste si le livre est sur le cartable
+     ====================================================== */
+
+    /**
+     * COMPORTEMENT PARASITE — Force initiale CONSTANTE :
+     * Au moment où le joueur attrape un livre, une force fixe est générée
+     * dans une direction aléatoire orientée vers la gauche.
+     * Cette force s'applique EN PERMANENCE pendant tout le drag :
+     * le joueur doit donc maintenir une contre-pression continue
+     * avec sa souris pour garder le livre sur la trajectoire voulue.
+     * La force ne s'amortit PAS — elle reste identique du début à la fin du drag.
+     */
+    function appliquerForceInitiale() {
+    // ---- Magnitude de la force (en pixels appliqués par frame) ----
+    // Plus la valeur est haute, plus le livre "résiste" fortement.
+    // Valeur recommandée : entre 1.5 et 4.0
+    const magnitude = 1.5 + Math.random() * 2.5; // entre 1.5 et 4.0 px/frame
+
+    // ---- Direction : orientée vers la gauche ----
+    // Angle aléatoire entre 135° et 225° (gauche ± 45°)
+    //   0°   = droite
+    //   90°  = bas
+    //   180° = gauche  ← centre de la plage
+    //   270° = haut
+    const angleMin = (135 * Math.PI) / 180;
+    const angleMax = (225 * Math.PI) / 180;
+    const angle    = angleMin + Math.random() * (angleMax - angleMin);
+
+    // ---- Décomposition en composantes X et Y ----
+    // Ces valeurs sont FIXES pour toute la durée du drag
+    forceStatX = Math.cos(angle) * magnitude;
+    forceStatY = Math.sin(angle) * magnitude;
+    }
+
+  function onBookMouseDown(e) {
+    e.preventDefault();
+    demarrerDrag(e.currentTarget, e.clientX, e.clientY);
+  }
+
+  function onBookTouchStart(e) {
+    e.preventDefault();
+    const touch = e.touches[0];
+    demarrerDrag(e.currentTarget, touch.clientX, touch.clientY);
+  }
+
+  /**
+   * Démarre le glissement d'un livre.
+   * @param {HTMLElement} bookEl - L'élément livre cliqué
+   * @param {number} clientX     - Position X du pointeur (viewport)
+   * @param {number} clientY     - Position Y du pointeur (viewport)
+   */
+  function demarrerDrag(e, livreEl) {
+    e.preventDefault();
+    if (livreEnDrag) return; // un seul livre à la fois
+
+    livreEnDrag = livreEl;
+
+    // Récupère la position actuelle du livre dans le DOM
+    const rect = livreEl.getBoundingClientRect();
+    currentX   = rect.left;
+    currentY   = rect.top;
+
+    // Mémorise la position souris AU MOMENT du grab
+    // comme point de départ pour les deltas
+    prevMouseX = e.clientX;
+    prevMouseY = e.clientY;
+    mouseX     = e.clientX;
+    mouseY     = e.clientY;
+
+    // Passe le livre en position fixe pour le drag
+    livreEl.style.position = 'fixed';
+    livreEl.style.left     = currentX + 'px';
+    livreEl.style.top      = currentY + 'px';
+    livreEl.style.zIndex   = '1000';
+    livreEl.style.cursor   = 'grabbing';
+
+    // Génère la force constante pour ce drag
+    appliquerForceInitiale();
+
+    // Lance la boucle d'animation
+    rafId = requestAnimationFrame(boucleRendu);
+    }
+
+  function onMouseMove(e) {
+    mettreAJourTarget(e.clientX, e.clientY);
+  }
+
+  function onTouchMove(e) {
+    e.preventDefault();
+    const touch = e.touches[0];
+    mettreAJourTarget(touch.clientX, touch.clientY);
+  }
+
+  /**
+   * Met à jour la position cible (là où le joueur veut déplacer le livre)
+   * et gère l'indication visuelle de survol du cartable.
+   */
+  function mettreAJourTarget(clientX, clientY) {
+    if (!livreEnDrag) return;
+
+    const container = document.getElementById('books-container');
+    const contRect  = container.getBoundingClientRect();
+
+    // Position désirée dans le repère du container
+    targetX = clientX - contRect.left - clickOffsetX;
+    targetY = clientY - contRect.top  - clickOffsetY;
+
+    // Highlight du cartable si le curseur est au-dessus
+    const dropzone  = document.getElementById('bag-dropzone');
+    const dropRect  = dropzone.getBoundingClientRect();
+    const surDropzone = (
+      clientX >= dropRect.left && clientX <= dropRect.right &&
+      clientY >= dropRect.top  && clientY <= dropRect.bottom
+    );
+    dropzone.classList.toggle('over', surDropzone);
+  }
+
+  function onMouseUp(e) {
+    finDrag(e.clientX, e.clientY);
+  }
+
+  function onTouchEnd(e) {
+    const touch = e.changedTouches[0];
+    finDrag(touch.clientX, touch.clientY);
+  }
+
+  /** Arrête le drag et vérifie si le dépôt est valide */
+  function finDrag(clientX, clientY) {
+    if (!livreEnDrag) return;
+
+    // Arrête la boucle de rendu
+    cancelAnimationFrame(rafId);
+    rafId = null;
+
+    // Nettoie le style du livre
+    livreEnDrag.classList.remove('grabbed');
+
+    // Vérifie si le livre se trouve sur la drop zone
+    const dropzone = document.getElementById('bag-dropzone');
+    const dropRect = dropzone.getBoundingClientRect();
+
+    const surDropzone = (
+      clientX >= dropRect.left && clientX <= dropRect.right &&
+      clientY >= dropRect.top  && clientY <= dropRect.bottom
+    );
+
+    if (surDropzone) {
+      deposerLivre(livreEnDrag);
+    } else {
+      // Sinon, le livre reste là où il a été lâché (currentX/Y)
+      livreEnDrag.style.left = currentX + 'px';
+      livreEnDrag.style.top  = currentY + 'px';
+    }
+
+    dropzone.classList.remove('over');
+
+    // Détache les listeners globaux
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup',   onMouseUp);
+    document.removeEventListener('touchmove', onTouchMove);
+    document.removeEventListener('touchend',  onTouchEnd);
+
+    livreEnDrag = null;
+    forceStatX  = 0;
+    forceStatY  = 0;
+  }
+
+  /**
+   * Boucle de rendu (requestAnimationFrame).
+   *
+   * À chaque frame, elle :
+   *   1. Interpole currentX/Y vers targetX/Y (inertie — lerp)
+   *   2. Soustrait progressivement la force statique (résistance persistante)
+   *   3. Ajoute un petit bruit aléatoire (tremblement)
+   *   4. Applique la position calculée au style CSS du livre
+   */
+  function boucleRendu() {
+    if (!livreEnDrag) return;
+
+    // ---- 1. Delta souris ----
+    // On calcule de COMBIEN la souris a bougé depuis la dernière frame.
+    // C'est ce delta qu'on applique au livre, pas la position absolue.
+    const deltaX = mouseX - prevMouseX;
+    const deltaY = mouseY - prevMouseY;
+
+    // La frame courante devient la frame précédente pour la prochaine itération
+    prevMouseX = mouseX;
+    prevMouseY = mouseY;
+
+    // ---- 2. Inertie sur le delta ----
+    // Au lieu de lerp vers une cible, on applique le delta
+    // amorti par un facteur d'inertie.
+    // INERTIE = 0.0 → le livre ne suit pas du tout
+    // INERTIE = 1.0 → le livre suit parfaitement (pas d'inertie)
+    // Valeur recommandée : entre 0.5 et 0.8
+    const INERTIE = 0.65;
+    currentX += deltaX * INERTIE;
+    currentY += deltaY * INERTIE;
+
+    // ---- 3. Force statique CONSTANTE ----
+    // Dérive permanente vers la gauche, indépendante du mouvement souris.
+    // Le joueur doit compenser en déplaçant sa souris dans la direction opposée.
+    currentX += forceStatX;
+    currentY += forceStatY;
+
+    // ---- 4. Tremblement ----
+    const AMPLITUDE_TREMBLEMENT = 2.2;
+    const bruX = (Math.random() - 0.5) * AMPLITUDE_TREMBLEMENT;
+    const bruY = (Math.random() - 0.5) * AMPLITUDE_TREMBLEMENT;
+
+    // ---- 5. Application au DOM ----
+    livreEnDrag.style.left = (currentX + bruX) + 'px';
+    livreEnDrag.style.top  = (currentY + bruY) + 'px';
+
+    rafId = requestAnimationFrame(boucleRendu);
+    }
+
+  /* ======================================================
+     ===== DÉPÔT D'UN LIVRE DANS LE CARTABLE ==============
+     ====================================================== */
+
+  /**
+   * Enregistre le livre dans le cartable et met à jour l'interface.
+   * @param {HTMLElement} bookEl
+   */
+  function deposerLivre(bookEl) {
+    const nom = bookEl.dataset.nom;
+
+    // Sécurité : ne pas déposer deux fois le même livre
+    if (livresDansCartable.includes(nom)) return;
+
+    livresDansCartable.push(nom);
+
+    // Griser le livre dans le tas
+    bookEl.classList.add('in-bag');
+    // Fige sa position là où il était quand il a été lâché
+    bookEl.style.left = currentX + 'px';
+    bookEl.style.top  = currentY + 'px';
+
+    // Trouve la couleur du livre dans la config
+    const config = TOUS_LES_LIVRES.find(l => l.nom === nom);
+    const couleur = config ? config.couleur : '#888';
+    const emoji   = config ? config.emoji   : '📚';
+
+    // Ajoute un tag coloré dans le cartable
+    const tag = document.createElement('div');
+    tag.className = 'bag-tag';
+    tag.style.backgroundColor = couleur;
+    tag.innerHTML = `${emoji} ${nom}`;
+    document.getElementById('bag-contents').appendChild(tag);
+
+    // Si le livre fait partie des requis, coche la tâche
+    if (LIVRES_REQUIS.includes(nom)) {
+      const taskEl = document.getElementById('task-' + cssId(nom));
+      if (taskEl) taskEl.classList.add('done');
+    }
+
+    // Vérifie si tous les livres requis sont dans le cartable
+    verifierVictoire();
+  }
+
+  /** Teste si le jeu est terminé (les 3 bons livres sont dans le cartable) */
+  function verifierVictoire() {
+    const tousPresents = LIVRES_REQUIS.every(n => livresDansCartable.includes(n));
+
+    if (tousPresents) {
+      // Arrête le chrono
+      stopChrono();
+      tempsFinale = secondes;
+
+      // Arrête toute mécanique de drag en cours
+      cancelAnimationFrame(rafId);
+      rafId = null;
+      if (livreEnDrag) {
+        livreEnDrag.classList.remove('grabbed');
+        livreEnDrag = null;
+      }
+
+      // Petite pause pour laisser voir le dernier livre se déposer
+      setTimeout(() => goTo('devine'), 700);
+    }
+  }
+
+  /* ======================================================
+     ===== ÉCRAN 3 — DEVINE LE TROUBLE ====================
+     ====================================================== */
+
+  function initDevine() {
+    reponseJoueur = null;
+
+    const grid = document.getElementById('troubles-grid');
+    grid.innerHTML = '';
+
+    // Mélange les troubles pour éviter un biais de position
+    const melanges = [...TROUBLES].sort(() => Math.random() - 0.5);
+
+    melanges.forEach(t => {
+      const card = document.createElement('div');
+      card.className = 'trouble-card';
+      card.innerHTML = `<span class="t-emoji">${t.emoji}</span>${t.nom}`;
+      card.addEventListener('click', () => selectionnerTrouble(t.nom, card));
+      grid.appendChild(card);
+    });
+
+    // Désactive le bouton Valider jusqu'à ce qu'une réponse soit choisie
+    document.getElementById('btn-valider').disabled = true;
+  }
+
+  /**
+   * Sélectionne une réponse.
+   * @param {string}      nom      - Nom du trouble
+   * @param {HTMLElement} cardEl   - Élément DOM de la carte
+   */
+  function selectionnerTrouble(nom, cardEl) {
+    // Désélectionne toutes les cartes
+    document.querySelectorAll('.trouble-card').forEach(c => c.classList.remove('selected'));
+    // Sélectionne celle-ci
+    cardEl.classList.add('selected');
+    reponseJoueur = nom;
+    // Active le bouton Valider
+    document.getElementById('btn-valider').disabled = false;
+  }
+
+  function validerReponse() {
+    if (!reponseJoueur) return;
+    goTo('score');
+  }
+
+  /* ======================================================
+     ===== ÉCRAN 4 — SCORE & EXPLICATION ==================
+     ====================================================== */
+
+  function initScore() {
+    // ---- Calcul du score ----
+    const scoreTemps = Math.max(0, SCORE_TEMPS_MAX - tempsFinale * PENALITE_PAR_SECONDE);
+    const estCorrect = (reponseJoueur === TROUBLE_CORRECT);
+    const bonusId    = estCorrect ? BONUS_IDENTIFICATION : 0;
+    const scoreTotal = scoreTemps + bonusId;
+
+    // ---- Mise à jour des chips de détail ----
+    document.getElementById('chip-temps').textContent =
+      `⏱️ Temps : ${scoreTemps} pts (${tempsFinale}s)`;
+
+    document.getElementById('chip-bonus').textContent =
+      estCorrect
+        ? `🧠 Identification : +${BONUS_IDENTIFICATION} pts ✅`
+        : `🧠 Identification : +0 pt ❌`;
+
+    // ---- Badge résultat ----
+    const badgeZone = document.getElementById('result-badge-zone');
+    if (estCorrect) {
+      badgeZone.innerHTML = `
+        <div class="result-badge correct">
+          ✅ Bravo ! Tu as bien identifié la <strong>Dyspraxie</strong> !
+        </div>`;
+    } else {
+      badgeZone.innerHTML = `
+        <div class="result-badge wrong">
+          ❌ La bonne réponse était <strong>${TROUBLE_CORRECT}</strong>
+          — tu as répondu : <em>${reponseJoueur || '—'}</em>
+        </div>`;
+    }
+
+    // ---- Texte pédagogique ----
+    document.getElementById('explication-texte').textContent      = EXPLICATION_TROUBLE;
+    document.getElementById('explication-source-texte').textContent = EXPLICATION_SOURCE;
+
+    // ---- Animation du compteur de score ----
+    animerCompteur(
+      document.getElementById('score-final-display'),
+      0,
+      scoreTotal,
+      1400  // durée en ms
+    );
+
+    // Remonte en haut de l'écran (utile si l'explication est longue)
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /**
+   * Anime un élément texte de startVal à endVal en dureMs millisecondes.
+   * Utilise un easing easeOutCubic pour un effet naturel.
+   *
+   * @param {HTMLElement} el
+   * @param {number}      startVal
+   * @param {number}      endVal
+   * @param {number}      dureMs
+   */
+  function animerCompteur(el, startVal, endVal, dureMs) {
+    const debut = performance.now();
+
+    function step(maintenant) {
+      const progress = Math.min((maintenant - debut) / dureMs, 1);
+      // Easing easeOutCubic : ralentit vers la fin
+      const eased = 1 - Math.pow(1 - progress, 3);
+      el.textContent = Math.round(startVal + (endVal - startVal) * eased);
+      if (progress < 1) requestAnimationFrame(step);
+    }
+
+    requestAnimationFrame(step);
+  }
+
+  /* ======================================================
+     ===== REJOUER ========================================
+     ====================================================== */
+
+  /** Remet tout à zéro et retourne à l'écran d'accueil */
+  function rejouer() {
+    stopChrono();
+    cancelAnimationFrame(rafId);
+    rafId = null;
+    livreEnDrag        = null;
+    livresDansCartable = [];
+    reponseJoueur      = null;
+    secondes           = 0;
+    tempsFinale        = 0;
+    forceStatX         = 0;
+    forceStatY         = 0;
+    goTo('accueil');
+  }
+
+  /* ======================================================
+     ===== UTILITAIRES ====================================
+     ====================================================== */
+
+  /**
+   * Transforme un nom de livre en identifiant CSS valide.
+   * Ex: "Géographie" → "gographie"
+   * @param {string} str
+   * @returns {string}
+   */
+  function cssId(str) {
+    return str.toLowerCase().replace(/[^a-z0-9]/g, '');
+  }
+
+  </script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"8607d2a720d14b038279025b2b5a82e5","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>

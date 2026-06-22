@@ -1,0 +1,675 @@
+/* ================================================
+   style-dyspraxie.css
+   Styles spécifiques à dyspraxie.html
+   (style.css n'est pas compatible — design système différent)
+================================================ */
+
+
+
+    /* ================================================
+       RESET & VARIABLES CSS
+    ================================================ */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg:           #eef2f7;
+      --surface:      #ffffff;
+      --primary:      #4a6fa5;
+      --primary-dk:   #335a8a;
+      --primary-lt:   #dce8f8;
+      --accent:       #e07b54;
+      --accent-dk:    #c5623c;
+      --success:      #4caf7d;
+      --success-dk:   #389160;
+      --danger:       #e05c5c;
+      --text:         #2c3e50;
+      --text-light:   #637082;
+      --border:       #cdd8e8;
+      --shadow-sm:    0 2px 8px  rgba(0,0,0,.08);
+      --shadow-md:    0 4px 20px rgba(0,0,0,.12);
+      --shadow-lg:    0 8px 32px rgba(0,0,0,.16);
+      --radius-sm:    8px;
+      --radius-md:    14px;
+      --radius-lg:    22px;
+      --font:         'Segoe UI', system-ui, -apple-system, sans-serif;
+      --transition:   .2s ease;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ================================================
+       SYSTÈME DE NAVIGATION PAR ÉCRANS
+       Chaque .screen est masqué par défaut.
+       La classe .active l'affiche.
+    ================================================ */
+    .screen {
+      display: none;
+      min-height: 100vh;
+      animation: screenFadeIn .4s ease forwards;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    @keyframes screenFadeIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0);    }
+    }
+
+    /* ================================================
+       COMPOSANTS RÉUTILISABLES
+    ================================================ */
+
+    /* --- Boutons --- */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 36px;
+      border: none;
+      border-radius: 50px;
+      font-family: var(--font);
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: .3px;
+      cursor: pointer;
+      transition: transform var(--transition),
+                  box-shadow var(--transition),
+                  background var(--transition),
+                  opacity var(--transition);
+      user-select: none;
+    }
+
+    .btn:hover:not(:disabled) {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn:active:not(:disabled) {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    .btn:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(74,111,165,.35);
+    }
+    .btn-primary:hover:not(:disabled) { background: var(--primary-dk); }
+
+    .btn-accent {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(224,123,84,.35);
+    }
+    .btn-accent:hover:not(:disabled) { background: var(--accent-dk); }
+
+    .btn-success {
+      background: var(--success);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(76,175,125,.35);
+    }
+    .btn-success:hover:not(:disabled) { background: var(--success-dk); }
+
+    /* --- Carte générique --- */
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-md);
+      padding: 28px;
+    }
+
+    /* ================================================
+       ÉCRAN 1 — ACCUEIL
+    ================================================ */
+    #screen-accueil {
+      display: flex;           /* sera écrasé si pas .active */
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(145deg, #dce8f8 0%, #fce9df 100%);
+      padding: 40px 20px;
+    }
+
+    /* On réactive flex quand actif */
+    #screen-accueil.active { display: flex; }
+
+    .accueil-inner {
+      max-width: 560px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .accueil-hero-icon {
+      font-size: 5.5rem;
+      display: block;
+      margin-bottom: 24px;
+      animation: heroFloat 3s ease-in-out infinite;
+      filter: drop-shadow(0 8px 16px rgba(0,0,0,.15));
+    }
+
+    @keyframes heroFloat {
+      0%,100% { transform: translateY(0)    rotate(-3deg); }
+      50%      { transform: translateY(-12px) rotate(3deg); }
+    }
+
+    .accueil-inner h1 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 900;
+      color: var(--primary);
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+
+    .accueil-inner h1 span {
+      color: var(--accent);
+    }
+
+    .accueil-inner .tagline {
+      font-size: 1.1rem;
+      color: var(--text-light);
+      line-height: 1.75;
+      margin-bottom: 28px;
+    }
+
+    .accueil-warning {
+      background: #fff8e1;
+      border-left: 4px solid #f6c343;
+      border-radius: var(--radius-sm);
+      padding: 14px 18px;
+      margin-bottom: 32px;
+      font-size: .9rem;
+      color: #7a5800;
+      text-align: left;
+      line-height: 1.6;
+    }
+
+    /* ================================================
+       ÉCRAN 2 — JEU
+    ================================================ */
+    #screen-jeu {
+      background: linear-gradient(160deg, #eef2ff 0%, #fdf6f0 100%);
+      padding: 20px;
+      /* overflow:hidden bloque le scroll de page pendant le drag */
+      overflow: hidden;
+      user-select: none;
+    }
+
+    #screen-jeu.active { display: flex; flex-direction: column; align-items: center; }
+
+    /* --- HUD (bandeau supérieur) --- */
+    .jeu-hud {
+      width: 100%;
+      max-width: 1080px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .chrono-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface);
+      border-radius: 50px;
+      padding: 10px 22px;
+      box-shadow: var(--shadow-sm);
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: 1px;
+    }
+
+    .chrono-icon { font-size: 1.4rem; }
+
+    .hud-tip {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: 50px;
+      padding: 8px 18px;
+      font-size: .82rem;
+      color: #92620a;
+      font-weight: 600;
+    }
+
+    /* --- Layout principal du jeu (3 colonnes) --- */
+    .jeu-layout {
+      width: 100%;
+      max-width: 1080px;
+      display: grid;
+      grid-template-columns: 190px 1fr 190px;
+      gap: 16px;
+      align-items: start;
+    }
+
+    /* --- Panneau liste de tâches --- */
+    .task-panel {
+      border-radius: var(--radius-md);
+      background: var(--surface);
+      box-shadow: var(--shadow-sm);
+      padding: 20px 16px;
+    }
+
+    .panel-title {
+      font-size: .72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-light);
+      margin-bottom: 14px;
+    }
+
+    .task-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-weight: 600;
+      font-size: .92rem;
+      color: var(--text);
+      transition: color var(--transition);
+    }
+
+    .task-item:last-child { border-bottom: none; }
+
+    /* Cercle de validation */
+    .task-check {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .75rem;
+      color: transparent;
+      flex-shrink: 0;
+      transition: background var(--transition),
+                  border-color var(--transition),
+                  color var(--transition);
+    }
+
+    .task-item.done .task-check {
+      background: var(--success);
+      border-color: var(--success);
+      color: #fff;
+    }
+
+    .task-item.done .task-label {
+      text-decoration: line-through;
+      color: var(--text-light);
+    }
+
+    /* --- Zone des livres (centre) --- */
+    .books-zone {
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      padding: 20px;
+      /* Position relative = référentiel pour les livres en position absolute */
+      position: relative;
+    }
+
+    /* Conteneur interne où les livres sont positionnés */
+    #books-container {
+      position: relative;
+      width: 100%;
+      height: 300px;
+      /* Empêche les livres de dépasser visuellement */
+      overflow: visible;
+    }
+
+    /* --- Livre individuel --- */
+    .book {
+      position: absolute;
+      width: 72px;
+      height: 95px;
+      border-radius: 5px 10px 10px 5px;
+      /* La tranche gauche du livre */
+      border-left: 9px solid rgba(0,0,0,.18);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      cursor: grab;
+      user-select: none;
+      box-shadow: 3px 4px 12px rgba(0,0,0,.2);
+      font-size: .6rem;
+      font-weight: 800;
+      color: rgba(255,255,255,.95);
+      text-align: center;
+      padding: 6px 4px;
+      line-height: 1.3;
+      /* Transition uniquement pour l'ombre, pas pour left/top (géré par RAF) */
+      transition: box-shadow var(--transition);
+      will-change: left, top;
+      touch-action: none;
+    }
+
+    /* Reflet décoratif sur la couverture */
+    .book::after {
+      content: '';
+      position: absolute;
+      top: 8px; bottom: 8px; right: 7px;
+      width: 3px;
+      background: rgba(255,255,255,.22);
+      border-radius: 2px;
+    }
+
+    .book .book-emoji {
+      font-size: 1.45rem;
+      line-height: 1;
+    }
+
+    .book:hover   { box-shadow: 5px 8px 22px rgba(0,0,0,.28); }
+    .book.grabbed { cursor: grabbing; box-shadow: 10px 14px 34px rgba(0,0,0,.38); z-index: 999; }
+
+    /* Livre déjà dans le cartable : grisé, non interactif */
+    .book.in-bag {
+      opacity: .3;
+      pointer-events: none;
+      cursor: default;
+      filter: grayscale(.6);
+    }
+
+    /* --- Panneau cartable (droite) --- */
+    .bag-panel {
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+
+    /* Zone de dépôt */
+    .bag-dropzone {
+      width: 100%;
+      min-height: 210px;
+      border: 3px dashed var(--border);
+      border-radius: var(--radius-sm);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 12px;
+      gap: 8px;
+      transition: border-color var(--transition), background var(--transition);
+    }
+
+    /* Survol actif par un livre */
+    .bag-dropzone.over {
+      border-color: var(--primary);
+      background: var(--primary-lt);
+    }
+
+    .bag-dropzone-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+
+    .bag-big-emoji { font-size: 2.8rem; }
+    .bag-drop-hint {
+      font-size: .72rem;
+      color: var(--text-light);
+      text-align: center;
+    }
+
+    /* Tags des livres déposés */
+    .bag-tag {
+      width: 100%;
+      padding: 7px 10px;
+      border-radius: var(--radius-sm);
+      color: #fff;
+      font-size: .78rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      animation: tagPop .25s cubic-bezier(.34,1.56,.64,1) forwards;
+    }
+
+    @keyframes tagPop {
+      from { transform: scale(.5); opacity: 0; }
+      to   { transform: scale(1);  opacity: 1; }
+    }
+
+    /* ================================================
+       ÉCRAN 3 — DEVINE LE TROUBLE
+    ================================================ */
+    #screen-devine {
+      background: linear-gradient(135deg, #f0fdf4 0%, #eff6ff 100%);
+      padding: 40px 20px;
+    }
+
+    #screen-devine.active {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .devine-card {
+      max-width: 660px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .devine-card h2 {
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+
+    .devine-sub {
+      color: var(--text-light);
+      font-size: .95rem;
+      margin-bottom: 28px;
+    }
+
+    /* Grille des troubles */
+    .troubles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .trouble-card {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 18px 10px;
+      cursor: pointer;
+      transition: all var(--transition);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: .92rem;
+      color: var(--text);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .trouble-card .t-emoji { font-size: 1.8rem; }
+
+    .trouble-card:hover {
+      border-color: var(--primary);
+      background: var(--primary-lt);
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .trouble-card.selected {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: #fff;
+      transform: translateY(-4px);
+      box-shadow: 0 6px 20px rgba(74,111,165,.4);
+    }
+
+    /* ================================================
+       ÉCRAN 4 — SCORE & EXPLICATION
+       Cet écran doit être scrollable → pas overflow:hidden
+    ================================================ */
+    #screen-score {
+      background: linear-gradient(145deg, #fdf6f0 0%, #eef2ff 100%);
+      padding: 40px 20px 60px;
+      /* min-height gère le scroll naturellement */
+    }
+
+    #screen-score.active {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .score-card {
+      max-width: 680px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .score-card > h2 {
+      font-size: clamp(1.5rem, 3.5vw, 2.2rem);
+      font-weight: 900;
+      color: var(--primary);
+      margin-bottom: 24px;
+    }
+
+    /* Bandeau score animé */
+    .score-banner {
+      background: linear-gradient(135deg, var(--primary) 0%, #7661c5 100%);
+      border-radius: var(--radius-lg);
+      padding: 30px 24px;
+      color: #fff;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 30px rgba(74,111,165,.4);
+    }
+
+    .score-number {
+      font-size: clamp(3.5rem, 10vw, 5.5rem);
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -3px;
+    }
+
+    .score-pts {
+      font-size: .95rem;
+      opacity: .8;
+      margin-top: 4px;
+      font-weight: 500;
+    }
+
+    /* Détail des composantes du score */
+    .score-details {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 18px;
+      flex-wrap: wrap;
+    }
+
+    .score-chip {
+      background: rgba(255,255,255,.18);
+      border-radius: 50px;
+      padding: 7px 16px;
+      font-size: .82rem;
+      font-weight: 600;
+      backdrop-filter: blur(4px);
+    }
+
+    /* Badge résultat identification */
+    .result-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 22px;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: .93rem;
+      margin-bottom: 22px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .result-badge.correct { background: #dcfce7; color: #166534; }
+    .result-badge.wrong   { background: #fee2e2; color: #991b1b; }
+
+    /* Bloc explication pédagogique */
+    .explication-box {
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-md);
+      padding: 26px 28px;
+      text-align: left;
+      margin-bottom: 28px;
+    }
+
+    .explication-box h3 {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .explication-box p {
+      font-size: .96rem;
+      line-height: 1.85;
+      color: var(--text);
+      white-space: pre-line; /* Respecte les sauts de ligne dans la constante */
+    }
+
+    .explication-source {
+      font-size: .78rem;
+      color: var(--text-light);
+      font-style: italic;
+      margin-top: 12px;
+    }
+
+    /* ================================================
+       RESPONSIVE
+    ================================================ */
+    @media (max-width: 700px) {
+      .jeu-layout {
+        grid-template-columns: 1fr;
+      }
+      #books-container {
+        height: 340px;
+      }
+    }
+
+  
