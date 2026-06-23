@@ -4,47 +4,650 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dans la Peau d'un Dyspraxique</title>
-  <link rel="stylesheet" href="style-dyspraxie.css">
+  <style>
 
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg:           #eef2f7;
+      --surface:      #ffffff;
+      --primary:      #4a6fa5;
+      --primary-dk:   #335a8a;
+      --primary-lt:   #dce8f8;
+      --accent:       #e07b54;
+      --accent-dk:    #c5623c;
+      --success:      #4caf7d;
+      --success-dk:   #389160;
+      --danger:       #e05c5c;
+      --text:         #2c3e50;
+      --text-light:   #637082;
+      --border:       #cdd8e8;
+      --shadow-sm:    0 2px 8px  rgba(0,0,0,.08);
+      --shadow-md:    0 4px 20px rgba(0,0,0,.12);
+      --shadow-lg:    0 8px 32px rgba(0,0,0,.16);
+      --radius-sm:    8px;
+      --radius-md:    14px;
+      --radius-lg:    22px;
+      --font:         'Segoe UI', system-ui, -apple-system, sans-serif;
+      --transition:   .2s ease;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ================================================
+       SYSTÈME D'ÉCRANS
+    ================================================ */
+    .screen {
+      display: none;
+      min-height: 100vh;
+    }
+    .screen.active { display: block; }
+
+    /* ================================================
+       BOUTONS GLOBAUX
+    ================================================ */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 32px;
+      border: none;
+      border-radius: 50px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform var(--transition), box-shadow var(--transition), background var(--transition);
+      text-decoration: none;
+    }
+    .btn:hover  { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .btn:active { transform: translateY(0); }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(74,111,165,.35);
+    }
+    .btn-primary:hover { background: var(--primary-dk); }
+
+    .btn-accent {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(224,123,84,.35);
+    }
+    .btn-accent:hover { background: var(--accent-dk); }
+
+    /* ================================================
+       ÉCRAN 1 — ACCUEIL
+    ================================================ */
+    #screen-accueil.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .accueil-inner {
+      max-width: 620px;
+      width: 100%;
+      text-align: center;
+      padding: 40px 24px;
+    }
+
+    .accueil-hero-icon {
+      font-size: 5rem;
+      display: block;
+      margin-bottom: 20px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-10px); }
+    }
+
+    .accueil-inner h1 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 900;
+      line-height: 1.2;
+      margin-bottom: 16px;
+      color: var(--text);
+    }
+
+    .accueil-inner h1 span {
+      color: var(--primary);
+      position: relative;
+    }
+
+    .tagline {
+      font-size: 1.05rem;
+      color: var(--text-light);
+      line-height: 1.7;
+      margin-bottom: 28px;
+    }
+
+    .accueil-warning {
+      background: #fff8e1;
+      border: 2px solid #ffe082;
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      margin-bottom: 32px;
+      font-size: .92rem;
+      color: #7a5f00;
+      line-height: 1.6;
+      text-align: left;
+    }
+
+    /* ================================================
+       ÉCRAN 2 — JEU
+    ================================================ */
+    #screen-jeu.active {
+      display: flex;
+      flex-direction: column;
+      cursor: none; /* cache le vrai curseur */
+    }
+
+    .jeu-hud {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 28px;
+      background: var(--surface);
+      box-shadow: var(--shadow-sm);
+      flex-shrink: 0;
+      position: relative;
+      z-index: 10;
+    }
+
+    .chrono-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--primary-lt);
+      border-radius: 50px;
+      padding: 8px 18px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--primary-dk);
+    }
+
+    .hud-tip {
+      font-size: .9rem;
+      color: var(--text-light);
+      font-weight: 600;
+    }
+
+    .jeu-layout {
+      display: grid;
+      grid-template-columns: 220px 1fr 240px;
+      gap: 20px;
+      padding: 20px 28px;
+      flex: 1;
+      min-height: 0;
+    }
+
+    /* --- Panel tâches --- */
+    .task-panel {
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .task-panel h3,
+    .books-zone h3,
+    .bag-panel h3 {
+      font-size: .85rem;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--text-light);
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    #task-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .task-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      background: var(--bg);
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      font-size: .9rem;
+      transition: background var(--transition);
+    }
+
+    .task-check {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      border: 2.5px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .75rem;
+      color: transparent;
+      flex-shrink: 0;
+      transition: all var(--transition);
+    }
+
+    .task-item.done {
+      background: #f0fdf4;
+      color: var(--success-dk);
+    }
+
+    .task-item.done .task-check {
+      background: var(--success);
+      border-color: var(--success);
+      color: #fff;
+    }
+
+    /* --- Zone livres --- */
+    .books-zone {
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      overflow: hidden;
+    }
+
+    #books-container {
+      position: relative;
+      flex: 1;
+      min-height: 300px;
+    }
+
+    /* --- Livre individuel --- */
+    .book {
+      position: absolute;
+      width: 72px;
+      height: 95px;
+      border-radius: 5px 10px 10px 5px;
+      border-left: 9px solid rgba(0,0,0,.18);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      user-select: none;
+      box-shadow: 3px 4px 12px rgba(0,0,0,.2);
+      font-size: .6rem;
+      font-weight: 800;
+      color: rgba(255,255,255,.95);
+      text-align: center;
+      padding: 6px 4px;
+      line-height: 1.3;
+      will-change: left, top;
+      touch-action: none;
+    }
+
+    .book::after {
+      content: '';
+      position: absolute;
+      top: 8px; bottom: 8px; right: 7px;
+      width: 3px;
+      background: rgba(255,255,255,.22);
+      border-radius: 2px;
+    }
+
+    .book .book-emoji { font-size: 1.45rem; line-height: 1; }
+
+    .book.in-bag {
+      opacity: .3;
+      pointer-events: none;
+      cursor: default;
+      filter: grayscale(.6);
+    }
+
+    /* --- Cartable (droite) --- */
+    .bag-panel {
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    #bag-dropzone {
+      flex: 1;
+      border: 3px dashed var(--border);
+      border-radius: var(--radius-md);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      color: var(--text-light);
+      font-size: .85rem;
+      font-weight: 600;
+      transition: border-color var(--transition), background var(--transition), transform .1s;
+      min-height: 260px;
+      padding: 12px;
+    }
+
+    .bag-icon { font-size: 2.5rem; }
+
+    #bag-dropzone.over {
+      border-color: var(--success);
+      background: #f0fdf4;
+      transform: scale(1.02);
+    }
+
+    #bag-contents {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      width: 100%;
+    }
+
+    .bag-tag {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      color: #fff;
+      font-size: .82rem;
+      font-weight: 700;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* ================================================
+       CURSEUR VIRTUEL
+    ================================================ */
+    #virtual-cursor {
+      position: fixed;
+      top: 0; left: 0;
+      width: 32px; height: 32px;
+      margin-left: -16px; margin-top: -16px;
+      border: 3px solid var(--accent);
+      border-radius: 50%;
+      background: rgba(224, 123, 84, .2);
+      pointer-events: none;
+      z-index: 99999;
+      transition: background .15s, border-color .15s;
+    }
+
+    #virtual-cursor::after {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 5px; height: 5px;
+      margin: -2.5px 0 0 -2.5px;
+      background: var(--accent-dk);
+      border-radius: 50%;
+    }
+
+    #virtual-cursor.grabbing {
+      border-color: var(--success);
+      background: rgba(76, 175, 125, .25);
+      width: 38px; height: 38px;
+      margin-left: -19px; margin-top: -19px;
+    }
+
+    #virtual-cursor.hidden { display: none; }
+
+    /* ================================================
+       ÉCRAN 3 — DEVINE LE TROUBLE
+    ================================================ */
+    #screen-devine {
+      background: linear-gradient(135deg, #f0fdf4 0%, #eff6ff 100%);
+      padding: 40px 20px;
+    }
+    #screen-devine.active {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .devine-card {
+      max-width: 660px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .devine-card h2 {
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+
+    .devine-sub {
+      color: var(--text-light);
+      font-size: .95rem;
+      margin-bottom: 28px;
+    }
+
+    .troubles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .trouble-btn {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 18px 10px;
+      cursor: pointer;
+      font-size: .9rem;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      transition: border-color var(--transition), background var(--transition), transform var(--transition);
+    }
+    .trouble-btn .t-emoji { font-size: 1.8rem; }
+    .trouble-btn:hover    { border-color: var(--primary); background: var(--primary-lt); transform: translateY(-2px); }
+    .trouble-btn.selected { border-color: var(--primary); background: var(--primary-lt); }
+    .trouble-btn.correct  { border-color: var(--success); background: #f0fdf4; color: var(--success-dk); }
+    .trouble-btn.wrong    { border-color: var(--danger);  background: #fef2f2; color: var(--danger); }
+
+    #btn-valider-trouble { display: none; margin: 0 auto; }
+
+    /* ================================================
+       ÉCRAN 4 — SCORE
+    ================================================ */
+    #screen-score {
+      background: linear-gradient(135deg, #eff6ff 0%, #f5f0ff 100%);
+      padding: 40px 20px;
+      overflow-y: auto;
+    }
+    #screen-score.active { display: block; }
+
+    .score-card {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .score-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .score-trophy { font-size: 4rem; display: block; margin-bottom: 12px; }
+
+    .score-header h2 {
+      font-size: clamp(1.5rem, 3vw, 2.2rem);
+      font-weight: 900;
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+
+    .score-header p { color: var(--text-light); font-size: .95rem; }
+
+    .score-big {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      padding: 28px;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .score-label {
+      font-size: .85rem;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--text-light);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .score-number {
+      font-size: clamp(3rem, 8vw, 5rem);
+      font-weight: 900;
+      color: var(--primary);
+      line-height: 1;
+    }
+
+    .score-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .score-detail-item {
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      padding: 18px;
+      text-align: center;
+    }
+
+    .score-detail-item .sd-label {
+      font-size: .8rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--text-light);
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .score-detail-item .sd-value {
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: var(--text);
+    }
+
+    .result-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 8px;
+      padding: 4px 14px;
+      border-radius: 50px;
+      font-size: .8rem;
+      font-weight: 700;
+    }
+    .result-badge.correct { background: #f0fdf4; color: var(--success-dk); }
+    .result-badge.wrong   { background: #fef2f2; color: var(--danger); }
+
+    .explication-box {
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .explication-box h3 {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 14px;
+    }
+
+    .explication-box p {
+      font-size: .92rem;
+      color: var(--text);
+      line-height: 1.75;
+      white-space: pre-line;
+      margin-bottom: 10px;
+    }
+
+    .explication-source {
+      font-size: .8rem !important;
+      color: var(--text-light) !important;
+      font-style: italic;
+    }
+
+    .score-actions {
+      text-align: center;
+      padding-bottom: 40px;
+    }
+
+    /* ================================================
+       RESPONSIVE
+    ================================================ */
+    @media (max-width: 700px) {
+      .jeu-layout { grid-template-columns: 1fr; }
+      #books-container { height: 340px; }
+      .score-details { grid-template-columns: 1fr; }
+    }
+
+  </style>
 </head>
 <body>
+
+  <!-- Curseur virtuel (toujours présent dans le DOM) -->
+  <div id="virtual-cursor" class="hidden"></div>
 
   <!-- ====================================================
        ÉCRAN 1 — ACCUEIL
   ==================================================== -->
   <section id="screen-accueil" class="screen active">
     <div class="accueil-inner">
-
       <span class="accueil-hero-icon">🎒</span>
-
       <h1>Dans la peau<br>d'un <span>Dyspraxique</span></h1>
-
       <p class="tagline">
         Prépare ton cartable… mais ton corps refuse de t'obéir.<br>
         Vis quelques instants dans le quotidien de ceux dont
         les gestes ne répondent jamais comme prévu.
       </p>
-
       <div class="accueil-warning">
         ⚠️ <strong>Attention :</strong> Le curseur va se comporter de façon
         volontairement étrange — c'est entièrement voulu et fait partie de
         l'expérience ! Ne cherche pas à réparer ton ordinateur. 😄
       </div>
-
       <button class="btn btn-primary" onclick="goTo('jeu')">
         ▶&nbsp; Commencer l'expérience
       </button>
-
     </div>
   </section>
-
 
   <!-- ====================================================
        ÉCRAN 2 — JEU
   ==================================================== -->
   <section id="screen-jeu" class="screen">
 
-    <!-- Bandeau supérieur : chronomètre + consigne -->
     <div class="jeu-hud">
       <div class="chrono-pill">
         <span class="chrono-icon">⏱️</span>
@@ -55,104 +658,86 @@
       </div>
     </div>
 
-    <!-- Grille en 3 colonnes -->
     <div class="jeu-layout">
 
-      <!-- Colonne gauche : liste de tâches -->
       <div class="task-panel">
-        <div class="panel-title">📋 À ranger :</div>
-        <div id="task-list"><!-- Rempli par JS --></div>
+        <h3>📋 À ranger</h3>
+        <div id="task-list"></div>
       </div>
 
-      <!-- Colonne centrale : tas de livres -->
       <div class="books-zone">
-        <div class="panel-title">📚 Tes livres :</div>
-        <!--
-          Les livres sont positionnés en "absolute" dans ce conteneur.
-          Le conteneur lui-même est en "relative" → il sert de repère.
-        -->
-        <div id="books-container"><!-- Rempli par JS --></div>
+        <h3>📚 Tes livres</h3>
+        <div id="books-container"></div>
       </div>
 
-      <!-- Colonne droite : cartable -->
       <div class="bag-panel">
-        <div class="panel-title">🎒 Cartable :</div>
-        <div class="bag-dropzone" id="bag-dropzone">
-          <div class="bag-dropzone-header">
-            <span class="bag-big-emoji">🎒</span>
-            <span class="bag-drop-hint">Dépose tes livres ici</span>
-          </div>
-          <!-- Les tags des livres déposés s'ajoutent ici -->
-          <div id="bag-contents"><!-- Rempli par JS --></div>
+        <h3>🎒 Cartable</h3>
+        <div id="bag-dropzone">
+          <span class="bag-icon">🎒</span>
+          <div id="bag-contents"></div>
+          <span>Dépose ici</span>
         </div>
       </div>
 
     </div>
   </section>
-
 
   <!-- ====================================================
        ÉCRAN 3 — DEVINE LE TROUBLE
   ==================================================== -->
   <section id="screen-devine" class="screen">
-
-    <div class="card devine-card">
-      <h2>🤔 Selon toi…</h2>
-      <p class="devine-sub">
-        Quel trouble neurologique venais-tu de simuler ?
-      </p>
-
-      <!-- Grille des choix — remplie dynamiquement par JS -->
+    <div class="devine-card">
+      <h2>🤔 Quel trouble as-tu simulé ?</h2>
+      <p class="devine-sub">D'après ton expérience, quel trouble neurologique venais-tu de ressentir ?</p>
       <div class="troubles-grid" id="troubles-grid"></div>
-
-      <button
-        class="btn btn-success"
-        id="btn-valider"
-        onclick="validerReponse()"
-        disabled
-      >
+      <button class="btn btn-primary" id="btn-valider-trouble" onclick="validerTrouble()">
         ✅&nbsp; Valider ma réponse
       </button>
     </div>
-
   </section>
-
 
   <!-- ====================================================
        ÉCRAN 4 — SCORE & EXPLICATION
   ==================================================== -->
   <section id="screen-score" class="screen">
+    <div class="score-card">
 
-    <div class="score-card card">
+      <div class="score-header">
+        <span class="score-trophy">🏆</span>
+        <h2>Résultats</h2>
+        <p>Voici comment tu t'en es sorti face à la dyspraxie !</p>
+      </div>
 
-      <h2>🏁 Résultats</h2>
-
-      <!-- Bandeau score (nombre animé) -->
-      <div class="score-banner">
+      <div class="score-big">
+        <div class="score-label">Score total</div>
         <div class="score-number" id="score-final-display">0</div>
-        <div class="score-pts">points</div>
-        <div class="score-details">
-          <div class="score-chip" id="chip-temps">⏱️ Temps : —</div>
-          <div class="score-chip" id="chip-bonus">🧠 Identification : —</div>
+      </div>
+
+      <div class="score-details">
+        <div class="score-detail-item">
+          <div class="sd-label">⏱️ Temps</div>
+          <div class="sd-value" id="score-temps-display">--</div>
+        </div>
+        <div class="score-detail-item">
+          <div class="sd-label">🧠 Identification</div>
+          <div class="sd-value" id="score-identification-display">--</div>
+          <div id="result-badge-container"></div>
         </div>
       </div>
 
-      <!-- Badge bonne/mauvaise réponse -->
-      <div id="result-badge-zone" style="margin-bottom:20px;"></div>
-
-      <!-- Bloc pédagogique -->
       <div class="explication-box">
         <h3>📖 La Dyspraxie, c'est quoi ?</h3>
-        <p id="explication-texte"><!-- Rempli par JS depuis la constante --></p>
+        <p id="explication-texte"></p>
         <p class="explication-source" id="explication-source-texte"></p>
       </div>
 
-      <button class="btn btn-accent" onclick="rejouer()">
-        🔄&nbsp; Rejouer
-      </button>
+      <div class="score-actions">
+        <button class="btn btn-accent" onclick="rejouer()">
+          🔄&nbsp; Rejouer
+        </button>
+      </div>
 
     </div>
-
   </section>
 
 
@@ -162,40 +747,22 @@
   <script>
 
   /* ======================================================
-     ===== CONFIGURATION — Modifie ces valeurs librement ==
-     ====================================================== */
+     CONFIGURATION
+  ====================================================== */
 
-  /**
-   * Liste des troubles affichés à l'écran 3.
-   * Ajoute ou retire des entrées facilement.
-   * Chaque entrée : { nom: string, emoji: string }
-   */
   const TROUBLES = [
     { nom: "Dyslexie",        emoji: "📖" },
     { nom: "Dyscalculie",     emoji: "🔢" },
     { nom: "Dysgraphie",      emoji: "✍️" },
-    { nom: "Dyspraxie",       emoji: "🤲" },   // ← bonne réponse
+    { nom: "Dyspraxie",       emoji: "🤲" },
     { nom: "Dysorthographie", emoji: "🔤" },
     { nom: "TDA/H",           emoji: "⚡" },
   ];
 
-  /**
-   * Nom exact du trouble simulé.
-   * Doit correspondre au champ "nom" d'une entrée dans TROUBLES.
-   */
   const TROUBLE_CORRECT = "Dyspraxie";
 
-  /**
-   * Livres que le joueur DOIT ranger dans le cartable pour gagner.
-   * Les noms doivent correspondre exactement à TOUS_LES_LIVRES ci-dessous.
-   */
   const LIVRES_REQUIS = ["Maths", "Français", "Histoire"];
 
-  /**
-   * Tous les livres affichés dans le tas.
-   * couleur : couleur CSS de la couverture
-   * emoji   : icône affiché sur le livre
-   */
   const TOUS_LES_LIVRES = [
     { nom: "Maths",       couleur: "#4a6fa5", emoji: "📐" },
     { nom: "Français",    couleur: "#7b5ea7", emoji: "📝" },
@@ -207,193 +774,265 @@
     { nom: "Anglais",     couleur: "#c87c35", emoji: "🇬🇧" },
   ];
 
-  /** Score maximum accordé pour la vitesse */
-  const SCORE_TEMPS_MAX = 1000;
-
-  /** Points perdus par seconde (plus élevé = plus punitif) */
+  const SCORE_TEMPS_MAX      = 1000;
   const PENALITE_PAR_SECONDE = 12;
-
-  /** Bonus si le joueur identifie correctement le trouble */
   const BONUS_IDENTIFICATION = 300;
 
-  /**
-   * Texte pédagogique affiché à l'écran 4.
-   * Utilise des sauts de ligne (\n\n) pour créer des paragraphes.
-   * Le CSS white-space:pre-line les respecte.
-   */
   const EXPLICATION_TROUBLE = `La dyspraxie (officiellement appelée Trouble Développemental de la Coordination – TDC) est un trouble neurologique qui affecte la planification, la coordination et l'exécution des gestes intentionnels.
 
 Contrairement à ce qu'on pourrait croire, elle n'a aucun lien avec l'intelligence. Une personne dyspraxique peut être brillante intellectuellement tout en trouvant épuisant d'écrire, de s'habiller, de ranger ses affaires ou de pratiquer un sport.
 
-En France, environ 5 à 7 % des élèves seraient concernés. Beaucoup passent des années sans diagnostic, souvent perçus à tort comme "maladroits", "désorganisés" ou "peu motivés".
 
 Avec des aménagements adaptés — temps supplémentaire, outils numériques, bienveillance du corps enseignant — les élèves dyspraxiques peuvent pleinement réussir leur scolarité et s'épanouir.`;
 
-  /** Petit crédit affiché sous l'explication */
   const EXPLICATION_SOURCE = "Source : Fédération Française des DYS (ffdys.com) — Inserm 2023";
 
   /* ======================================================
-     ===== ÉTAT INTERNE DU JEU ============================
-     ====================================================== */
+     PARAMÈTRES CURSEUR VIRTUEL  ← modifie ici
+  ====================================================== */
 
-  /** Nombres de secondes écoulées depuis le début du jeu */
-  let secondes = 0;
+  // Force de dérive (plus grand = curseur qui résiste plus)
+  const DRIFT_MAGNITUDE_MIN  = 0.7;
+  const DRIFT_MAGNITUDE_MAX  = 1.5;
 
-  /** Référence à l'intervalle du chronomètre (pour pouvoir l'arrêter) */
-  let chronoInterval = null;
+  // Fréquence de changement de direction (ms)
+  const DRIFT_INTERVALLE_MS  = 1800;
 
-  /** Noms des livres actuellement dans le cartable */
-  let livresDansCartable = [];
+  // Friction du curseur virtuel (0 = stop immédiat, 1 = glisse à l'infini)
+  const CURSOR_FRICTION      = 0.85;
 
-  /** Réponse sélectionnée à l'écran 3 */
-  let reponseJoueur = null;
+  // Sensibilité de la vraie souris sur le curseur virtuel
+  const MOUSE_SENSIBILITE    = 1;
 
-  /** Temps (en secondes) au moment où le jeu se termine */
-  let tempsFinale = 0;
-
-  /* --- Variables de la mécanique de drag --- */
-
-  /** L'élément DOM du livre en cours de glissement (ou null) */
-  let livreEnDrag = null;
-
-  /**
-   * Décalage entre le point de clic et le coin haut-gauche du livre.
-   * Calculé au mousedown pour que le livre ne "saute" pas sous le curseur.
-   */
-  let clickOffsetX = 0;
-  let clickOffsetY = 0;
-
-  /**
-   * Position CIBLE du livre (là où le curseur veut qu'il aille).
-   * Mise à jour à chaque mousemove.
-   */
-  let targetX = 0;
-  let targetY = 0;
-
-  /**
-   * Position ACTUELLE du livre (lissée vers targetX/Y par interpolation).
-   * C'est ce qui est réellement appliqué au style left/top.
-   */
-  let currentX = 0;
-  let currentY = 0;
-
-  // Position de la souris à la FRAME PRÉCÉDENTE
-  // (pour calculer le delta de déplacement)
-  let prevMouseX = 0;
-  let prevMouseY = 0;
-
-  // Position de la souris à la FRAME COURANTE
-  let mouseX = 0;
-  let mouseY = 0;
-  /**
-   * Force statique parasite appliquée au livre quand on l'attrape.
-   * Représente la "déviation initiale" : le livre part dans une direction
-   * aléatoire orientée vers la gauche, et la target doit contrebalancer.
-   */
-  let forceStatX = 0;
-  let forceStatY = 0;
-
-  /** Handle du requestAnimationFrame (pour pouvoir l'annuler) */
-  let rafId = null;
+  // Amplitude du tremblement du curseur (0 = aucun)
+  const TREMBLEMENT_AMPLITUDE = 1.2;
 
   /* ======================================================
-     ===== NAVIGATION ENTRE ÉCRANS ========================
-     ====================================================== */
+     ÉTAT INTERNE
+  ====================================================== */
 
-  /**
-   * Affiche l'écran dont l'id est passé en paramètre
-   * et masque tous les autres.
-   * @param {'accueil'|'jeu'|'devine'|'score'} id
-   */
+  let secondes           = 0;
+  let chronoInterval     = null;
+  let livresDansCartable = [];
+  let reponseJoueur      = null;
+  let tempsFinale        = 0;
+
+  /* --- Curseur virtuel --- */
+  let vX = window.innerWidth  / 2;   // position actuelle curseur virtuel
+  let vY = window.innerHeight / 2;
+  let vVX = 0;                        // vélocité
+  let vVY = 0;
+  let driftX = 0;                     // force de dérive actuelle
+  let driftY = 0;
+  let lastRealX = null;               // dernière pos vraie souris
+  let lastRealY = null;
+  let driftIntervalId = null;
+  let cursorRafId     = null;
+
+  /* --- Drag --- */
+  let livreEnDrag  = null;
+  let grabOffsetX  = 0;
+  let grabOffsetY  = 0;
+
+  /* ======================================================
+     NAVIGATION
+  ====================================================== */
+
   function goTo(id) {
-    // Masque tous les écrans
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-' + id).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'instant' });
 
-    // Affiche le bon écran
-    const el = document.getElementById('screen-' + id);
-    el.classList.add('active');
+    if (id === 'jeu') {
+      initJeu();
+      demarrerCurseurVirtuel();
+    } else {
+      arreterCurseurVirtuel();
+    }
 
-    // Actions d'initialisation spécifiques à chaque écran
-    if (id === 'jeu')    initJeu();
     if (id === 'devine') initDevine();
     if (id === 'score')  initScore();
   }
 
   /* ======================================================
-     ===== ÉCRAN 2 — INITIALISATION DU JEU ===============
-     ====================================================== */
+     CURSEUR VIRTUEL
+  ====================================================== */
+
+  function genererDrift() {
+    const magnitude = DRIFT_MAGNITUDE_MIN + Math.random() * (DRIFT_MAGNITUDE_MAX - DRIFT_MAGNITUDE_MIN);
+    const angle     = Math.random() * Math.PI * 2;
+    driftX = Math.cos(angle) * magnitude;
+    driftY = Math.sin(angle) * magnitude;
+  }
+
+  function demarrerCurseurVirtuel() {
+    const el = document.getElementById('virtual-cursor');
+    el.classList.remove('hidden');
+
+    // Centre le curseur virtuel au milieu de l'écran
+    vX  = window.innerWidth  / 2;
+    vY  = window.innerHeight / 2;
+    vVX = 0;
+    vVY = 0;
+    lastRealX = null;
+    lastRealY = null;
+
+    genererDrift();
+    driftIntervalId = setInterval(genererDrift, DRIFT_INTERVALLE_MS);
+
+    boucleVirtualCursor();
+  }
+
+  function arreterCurseurVirtuel() {
+    const el = document.getElementById('virtual-cursor');
+    el.classList.add('hidden');
+
+    if (driftIntervalId) { clearInterval(driftIntervalId); driftIntervalId = null; }
+    if (cursorRafId)     { cancelAnimationFrame(cursorRafId); cursorRafId = null; }
+    lastRealX = null;
+    lastRealY = null;
+  }
+
+  function boucleVirtualCursor() {
+    // 1. Tremblement aléatoire
+    const tremX = (Math.random() - 0.5) * TREMBLEMENT_AMPLITUDE;
+    const tremY = (Math.random() - 0.5) * TREMBLEMENT_AMPLITUDE;
+
+    // 2. Applique dérive + tremblement à la vélocité
+    vVX += driftX + tremX;
+    vVY += driftY + tremY;
+
+    // 3. Friction
+    vVX *= CURSOR_FRICTION;
+    vVY *= CURSOR_FRICTION;
+
+    // 4. Déplace le curseur virtuel
+    vX += vVX;
+    vY += vVY;
+
+    // 5. Clamp aux bords de la fenêtre
+    vX = Math.max(0, Math.min(window.innerWidth,  vX));
+    vY = Math.max(0, Math.min(window.innerHeight, vY));
+
+    // 6. Positionne l'élément DOM
+    const el = document.getElementById('virtual-cursor');
+    el.style.left = vX + 'px';
+    el.style.top  = vY + 'px';
+
+    // 7. Si un livre est en cours de drag, on le déplace avec le curseur virtuel
+    if (livreEnDrag) {
+      livreEnDrag.style.left = (vX - grabOffsetX) + 'px';
+      livreEnDrag.style.top  = (vY - grabOffsetY) + 'px';
+
+      // Highlight dropzone
+      const dz     = document.getElementById('bag-dropzone');
+      const dzRect = dz.getBoundingClientRect();
+      const surDz  = vX >= dzRect.left && vX <= dzRect.right &&
+                     vY >= dzRect.top  && vY <= dzRect.bottom;
+      dz.classList.toggle('over', surDz);
+    }
+
+    cursorRafId = requestAnimationFrame(boucleVirtualCursor);
+  }
+
+  // Écoute les mouvements de la vraie souris → ajoute un delta au curseur virtuel
+  document.addEventListener('mousemove', (e) => {
+    if (lastRealX === null) {
+      lastRealX = e.clientX;
+      lastRealY = e.clientY;
+      return;
+    }
+
+    const deltaX = (e.clientX - lastRealX) * MOUSE_SENSIBILITE;
+    const deltaY = (e.clientY - lastRealY) * MOUSE_SENSIBILITE;
+    lastRealX = e.clientX;
+    lastRealY = e.clientY;
+
+    // Injecte le delta dans la vélocité du curseur virtuel
+    vVX += deltaX;
+    vVY += deltaY;
+  });
+
+  // Touch
+  let lastTouchX = null;
+  let lastTouchY = null;
+
+  document.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    const t = e.touches[0];
+
+    if (lastTouchX === null) {
+      lastTouchX = t.clientX;
+      lastTouchY = t.clientY;
+      return;
+    }
+
+    const deltaX = (t.clientX - lastTouchX) * MOUSE_SENSIBILITE;
+    const deltaY = (t.clientY - lastTouchY) * MOUSE_SENSIBILITE;
+    lastTouchX = t.clientX;
+    lastTouchY = t.clientY;
+
+    vVX += deltaX;
+    vVY += deltaY;
+  }, { passive: false });
+
+  /* ======================================================
+     ÉCRAN 2 — INIT JEU
+  ====================================================== */
 
   function initJeu() {
-    // Réinitialise l'état
     livresDansCartable = [];
     secondes           = 0;
     reponseJoueur      = null;
     tempsFinale        = 0;
+    livreEnDrag        = null;
 
     stopChrono();
-    cancelAnimationFrame(rafId);
-    livreEnDrag = null;
 
-    // Vide les zones HTML dynamiques
-    document.getElementById('task-list').innerHTML    = '';
-    document.getElementById('books-container').innerHTML = '';
-    document.getElementById('bag-contents').innerHTML    = '';
+    document.getElementById('task-list').innerHTML        = '';
+    document.getElementById('books-container').innerHTML  = '';
+    document.getElementById('bag-contents').innerHTML     = '';
     document.getElementById('chrono-display').textContent = '00:00';
     document.getElementById('bag-dropzone').classList.remove('over');
 
-    // ---- Construit la liste de tâches ----
+    // Liste de tâches
     const taskList = document.getElementById('task-list');
-
     LIVRES_REQUIS.forEach(nom => {
       const div = document.createElement('div');
-      div.className  = 'task-item';
-      div.id         = 'task-' + cssId(nom);
-      div.innerHTML  = `
-        <div class="task-check">✓</div>
-        <span class="task-label">${nom}</span>
-      `;
+      div.className = 'task-item';
+      div.id        = 'task-' + cssId(nom);
+      div.innerHTML = `<div class="task-check">✓</div><span class="task-label">${nom}</span>`;
       taskList.appendChild(div);
     });
 
-    // ---- Place les livres aléatoirement dans le tas ----
+    // Livres
     const container = document.getElementById('books-container');
-
-    // Dimensions de la zone de placement
-    // On lit la largeur réelle, mais on utilise une hauteur fixe (cf CSS)
     const zoneW = container.offsetWidth  || 400;
-    const zoneH = 300; // correspond au height CSS de #books-container
+    const zoneH = container.offsetHeight || 340;
 
     TOUS_LES_LIVRES.forEach(data => {
-      // Position aléatoire (on laisse une marge pour que le livre reste visible)
-      const x = 10 + Math.random() * (zoneW - 90);
-      const y = 10 + Math.random() * (zoneH - 105);
+      const x = 10 + Math.random() * Math.max(0, zoneW - 90);
+      const y = 10 + Math.random() * Math.max(0, zoneH - 105);
 
       const div = document.createElement('div');
-      div.className = 'book';
-      div.id        = 'book-' + cssId(data.nom);
-      div.dataset.nom = data.nom;
+      div.className             = 'book';
+      div.id                    = 'book-' + cssId(data.nom);
+      div.dataset.nom           = data.nom;
       div.style.backgroundColor = data.couleur;
-      div.style.left = x + 'px';
-      div.style.top  = y + 'px';
-      div.innerHTML  = `
-        <span class="book-emoji">${data.emoji}</span>
-        ${data.nom}
-      `;
+      div.style.left            = x + 'px';
+      div.style.top             = y + 'px';
+      div.innerHTML = `<span class="book-emoji">${data.emoji}</span>${data.nom}`;
 
-      // Attache les listeners de drag (souris + tactile)
-      div.addEventListener('mousedown',  onBookMouseDown);
-      div.addEventListener('touchstart', onBookTouchStart, { passive: false });
-
+      // Les livres sont cliquables mais c'est le curseur VIRTUEL qui déclenche le grab
       container.appendChild(div);
     });
 
-    // ---- Démarre le chronomètre ----
     startChrono();
   }
 
   /* ======================================================
-     ===== CHRONOMÈTRE ====================================
-     ====================================================== */
+     CHRONOMÈTRE
+  ====================================================== */
 
   function startChrono() {
     stopChrono();
@@ -406,13 +1045,9 @@ Avec des aménagements adaptés — temps supplémentaire, outils numériques, b
   }
 
   function stopChrono() {
-    if (chronoInterval) {
-      clearInterval(chronoInterval);
-      chronoInterval = null;
-    }
+    if (chronoInterval) { clearInterval(chronoInterval); chronoInterval = null; }
   }
 
-  /** Formate les secondes en MM:SS et met à jour l'affichage */
   function afficherChrono(s) {
     const mm = String(Math.floor(s / 60)).padStart(2, '0');
     const ss = String(s % 60).padStart(2, '0');
@@ -420,451 +1055,253 @@ Avec des aménagements adaptés — temps supplémentaire, outils numériques, b
   }
 
   /* ======================================================
-     ===== MÉCANIQUE DE DRAG & DROP =======================
+     DRAG VIA CURSEUR VIRTUEL
+  ====================================================== */
 
-     Principe :
-       1. mousedown  → mémorise le livre, calcule offsets, applique
-                       la "force_initiale" parasite, lance la boucle RAF
-       2. mousemove  → met à jour targetX/Y (position désirée)
-       3. RAF loop   → interpole currentX/Y vers targetX/Y (inertie)
-                       + ajoute le tremblement
-                       + soustrait la force statique (résistance)
-       4. mouseup    → arrête le RAF, teste si le livre est sur le cartable
-     ====================================================== */
+  // Le mousedown réel est ignoré pour la position —
+  // on regarde quel livre est SOUS le curseur virtuel
+  document.addEventListener('mousedown', (e) => {
+    if (!document.getElementById('screen-jeu').classList.contains('active')) return;
+    if (livreEnDrag) return;
 
-    /**
-     * COMPORTEMENT PARASITE — Force initiale CONSTANTE :
-     * Au moment où le joueur attrape un livre, une force fixe est générée
-     * dans une direction aléatoire orientée vers la gauche.
-     * Cette force s'applique EN PERMANENCE pendant tout le drag :
-     * le joueur doit donc maintenir une contre-pression continue
-     * avec sa souris pour garder le livre sur la trajectoire voulue.
-     * La force ne s'amortit PAS — elle reste identique du début à la fin du drag.
-     */
-    function appliquerForceInitiale() {
-    // ---- Magnitude de la force (en pixels appliqués par frame) ----
-    // Plus la valeur est haute, plus le livre "résiste" fortement.
-    // Valeur recommandée : entre 1.5 et 4.0
-    const magnitude = 1.5 + Math.random() * 2.5; // entre 1.5 et 4.0 px/frame
+    const livre = livreSousCurseurVirtuel();
+    if (!livre) return;
 
-    // ---- Direction : orientée vers la gauche ----
-    // Angle aléatoire entre 135° et 225° (gauche ± 45°)
-    //   0°   = droite
-    //   90°  = bas
-    //   180° = gauche  ← centre de la plage
-    //   270° = haut
-    const angleMin = (135 * Math.PI) / 180;
-    const angleMax = (225 * Math.PI) / 180;
-    const angle    = angleMin + Math.random() * (angleMax - angleMin);
-
-    // ---- Décomposition en composantes X et Y ----
-    // Ces valeurs sont FIXES pour toute la durée du drag
-    forceStatX = Math.cos(angle) * magnitude;
-    forceStatY = Math.sin(angle) * magnitude;
-    }
-
-  function onBookMouseDown(e) {
     e.preventDefault();
-    demarrerDrag(e.currentTarget, e.clientX, e.clientY);
-  }
+    demarrerDrag(livre);
+  });
 
-  function onBookTouchStart(e) {
+  document.addEventListener('touchstart', (e) => {
+    if (!document.getElementById('screen-jeu').classList.contains('active')) return;
+    if (livreEnDrag) return;
+
+    const livre = livreSousCurseurVirtuel();
+    if (!livre) return;
+
     e.preventDefault();
-    const touch = e.touches[0];
-    demarrerDrag(e.currentTarget, touch.clientX, touch.clientY);
-  }
+    demarrerDrag(livre);
+  }, { passive: false });
 
-  /**
-   * Démarre le glissement d'un livre.
-   * @param {HTMLElement} bookEl - L'élément livre cliqué
-   * @param {number} clientX     - Position X du pointeur (viewport)
-   * @param {number} clientY     - Position Y du pointeur (viewport)
-   */
-  function demarrerDrag(e, livreEl) {
-    e.preventDefault();
-    if (livreEnDrag) return; // un seul livre à la fois
-
-    livreEnDrag = livreEl;
-
-    // Récupère la position actuelle du livre dans le DOM
-    const rect = livreEl.getBoundingClientRect();
-    currentX   = rect.left;
-    currentY   = rect.top;
-
-    // Mémorise la position souris AU MOMENT du grab
-    // comme point de départ pour les deltas
-    prevMouseX = e.clientX;
-    prevMouseY = e.clientY;
-    mouseX     = e.clientX;
-    mouseY     = e.clientY;
-
-    // Passe le livre en position fixe pour le drag
-    livreEl.style.position = 'fixed';
-    livreEl.style.left     = currentX + 'px';
-    livreEl.style.top      = currentY + 'px';
-    livreEl.style.zIndex   = '1000';
-    livreEl.style.cursor   = 'grabbing';
-
-    // Génère la force constante pour ce drag
-    appliquerForceInitiale();
-
-    // Lance la boucle d'animation
-    rafId = requestAnimationFrame(boucleRendu);
-    }
-
-  function onMouseMove(e) {
-    mettreAJourTarget(e.clientX, e.clientY);
-  }
-
-  function onTouchMove(e) {
-    e.preventDefault();
-    const touch = e.touches[0];
-    mettreAJourTarget(touch.clientX, touch.clientY);
-  }
-
-  /**
-   * Met à jour la position cible (là où le joueur veut déplacer le livre)
-   * et gère l'indication visuelle de survol du cartable.
-   */
-  function mettreAJourTarget(clientX, clientY) {
+  document.addEventListener('mouseup', () => {
     if (!livreEnDrag) return;
+    finDrag();
+  });
 
-    const container = document.getElementById('books-container');
-    const contRect  = container.getBoundingClientRect();
-
-    // Position désirée dans le repère du container
-    targetX = clientX - contRect.left - clickOffsetX;
-    targetY = clientY - contRect.top  - clickOffsetY;
-
-    // Highlight du cartable si le curseur est au-dessus
-    const dropzone  = document.getElementById('bag-dropzone');
-    const dropRect  = dropzone.getBoundingClientRect();
-    const surDropzone = (
-      clientX >= dropRect.left && clientX <= dropRect.right &&
-      clientY >= dropRect.top  && clientY <= dropRect.bottom
-    );
-    dropzone.classList.toggle('over', surDropzone);
-  }
-
-  function onMouseUp(e) {
-    finDrag(e.clientX, e.clientY);
-  }
-
-  function onTouchEnd(e) {
-    const touch = e.changedTouches[0];
-    finDrag(touch.clientX, touch.clientY);
-  }
-
-  /** Arrête le drag et vérifie si le dépôt est valide */
-  function finDrag(clientX, clientY) {
+  document.addEventListener('touchend', () => {
     if (!livreEnDrag) return;
+    finDrag();
+  });
 
-    // Arrête la boucle de rendu
-    cancelAnimationFrame(rafId);
-    rafId = null;
+  function livreSousCurseurVirtuel() {
+    // Cherche l'élément sous la position du curseur virtuel
+    const elements = document.elementsFromPoint(vX, vY);
+    return elements.find(el => el.classList && el.classList.contains('book') && !el.classList.contains('in-bag')) || null;
+  }
 
-    // Nettoie le style du livre
-    livreEnDrag.classList.remove('grabbed');
+  function demarrerDrag(bookEl) {
+    livreEnDrag = bookEl;
 
-    // Vérifie si le livre se trouve sur la drop zone
-    const dropzone = document.getElementById('bag-dropzone');
-    const dropRect = dropzone.getBoundingClientRect();
+    // Calcule l'offset entre le centre du curseur virtuel et le coin du livre
+    const rect   = bookEl.getBoundingClientRect();
+    grabOffsetX  = vX - rect.left;
+    grabOffsetY  = vY - rect.top;
 
-    const surDropzone = (
-      clientX >= dropRect.left && clientX <= dropRect.right &&
-      clientY >= dropRect.top  && clientY <= dropRect.bottom
-    );
+    // Passe en fixed pour drag libre sur tout l'écran
+    bookEl.style.position = 'fixed';
+    bookEl.style.left     = (vX - grabOffsetX) + 'px';
+    bookEl.style.top      = (vY - grabOffsetY) + 'px';
+    bookEl.style.zIndex   = '1000';
 
-    if (surDropzone) {
-      deposerLivre(livreEnDrag);
-    } else {
-      // Sinon, le livre reste là où il a été lâché (currentX/Y)
-      livreEnDrag.style.left = currentX + 'px';
-      livreEnDrag.style.top  = currentY + 'px';
+    document.getElementById('virtual-cursor').classList.add('grabbing');
+  }
+
+    function finDrag() {
+        if (!livreEnDrag) return;
+
+        const dz     = document.getElementById('bag-dropzone');
+        const dzRect = dz.getBoundingClientRect();
+
+        const surDropzone = vX >= dzRect.left && vX <= dzRect.right &&
+                            vY >= dzRect.top  && vY <= dzRect.bottom;
+
+        livreEnDrag.style.zIndex = '';
+        dz.classList.remove('over');
+        document.getElementById('virtual-cursor').classList.remove('grabbing');
+
+        if (surDropzone) {
+        deposerLivre(livreEnDrag);
+        } else {
+        const container = document.getElementById('books-container');
+        const contRect  = container.getBoundingClientRect();
+
+        // Position souhaitée du livre (coin haut-gauche)
+        let newLeft = vX - grabOffsetX - contRect.left;
+        let newTop  = vY - grabOffsetY - contRect.top;
+
+        // Clamp : on s'assure que le livre reste entièrement dans le container
+        const livreW = livreEnDrag.offsetWidth  || 72;
+        const livreH = livreEnDrag.offsetHeight || 95;
+
+        newLeft = Math.max(0, Math.min(contRect.width  - livreW, newLeft));
+        newTop  = Math.max(0, Math.min(contRect.height - livreH, newTop));
+
+        livreEnDrag.style.position = 'absolute';
+        livreEnDrag.style.left     = newLeft + 'px';
+        livreEnDrag.style.top      = newTop  + 'px';
+        }
+
+        livreEnDrag = null;
     }
 
-    dropzone.classList.remove('over');
-
-    // Détache les listeners globaux
-    document.removeEventListener('mousemove', onMouseMove);
-    document.removeEventListener('mouseup',   onMouseUp);
-    document.removeEventListener('touchmove', onTouchMove);
-    document.removeEventListener('touchend',  onTouchEnd);
-
-    livreEnDrag = null;
-    forceStatX  = 0;
-    forceStatY  = 0;
-  }
-
-  /**
-   * Boucle de rendu (requestAnimationFrame).
-   *
-   * À chaque frame, elle :
-   *   1. Interpole currentX/Y vers targetX/Y (inertie — lerp)
-   *   2. Soustrait progressivement la force statique (résistance persistante)
-   *   3. Ajoute un petit bruit aléatoire (tremblement)
-   *   4. Applique la position calculée au style CSS du livre
-   */
-  function boucleRendu() {
-    if (!livreEnDrag) return;
-
-    // ---- 1. Delta souris ----
-    // On calcule de COMBIEN la souris a bougé depuis la dernière frame.
-    // C'est ce delta qu'on applique au livre, pas la position absolue.
-    const deltaX = mouseX - prevMouseX;
-    const deltaY = mouseY - prevMouseY;
-
-    // La frame courante devient la frame précédente pour la prochaine itération
-    prevMouseX = mouseX;
-    prevMouseY = mouseY;
-
-    // ---- 2. Inertie sur le delta ----
-    // Au lieu de lerp vers une cible, on applique le delta
-    // amorti par un facteur d'inertie.
-    // INERTIE = 0.0 → le livre ne suit pas du tout
-    // INERTIE = 1.0 → le livre suit parfaitement (pas d'inertie)
-    // Valeur recommandée : entre 0.5 et 0.8
-    const INERTIE = 0.65;
-    currentX += deltaX * INERTIE;
-    currentY += deltaY * INERTIE;
-
-    // ---- 3. Force statique CONSTANTE ----
-    // Dérive permanente vers la gauche, indépendante du mouvement souris.
-    // Le joueur doit compenser en déplaçant sa souris dans la direction opposée.
-    currentX += forceStatX;
-    currentY += forceStatY;
-
-    // ---- 4. Tremblement ----
-    const AMPLITUDE_TREMBLEMENT = 2.2;
-    const bruX = (Math.random() - 0.5) * AMPLITUDE_TREMBLEMENT;
-    const bruY = (Math.random() - 0.5) * AMPLITUDE_TREMBLEMENT;
-
-    // ---- 5. Application au DOM ----
-    livreEnDrag.style.left = (currentX + bruX) + 'px';
-    livreEnDrag.style.top  = (currentY + bruY) + 'px';
-
-    rafId = requestAnimationFrame(boucleRendu);
-    }
 
   /* ======================================================
-     ===== DÉPÔT D'UN LIVRE DANS LE CARTABLE ==============
-     ====================================================== */
+     DÉPÔT DANS LE CARTABLE
+  ====================================================== */
 
-  /**
-   * Enregistre le livre dans le cartable et met à jour l'interface.
-   * @param {HTMLElement} bookEl
-   */
   function deposerLivre(bookEl) {
     const nom = bookEl.dataset.nom;
-
-    // Sécurité : ne pas déposer deux fois le même livre
     if (livresDansCartable.includes(nom)) return;
 
     livresDansCartable.push(nom);
-
-    // Griser le livre dans le tas
     bookEl.classList.add('in-bag');
-    // Fige sa position là où il était quand il a été lâché
-    bookEl.style.left = currentX + 'px';
-    bookEl.style.top  = currentY + 'px';
+    bookEl.style.position = '';
+    bookEl.style.left     = '';
+    bookEl.style.top      = '';
+    bookEl.style.zIndex   = '';
 
-    // Trouve la couleur du livre dans la config
-    const config = TOUS_LES_LIVRES.find(l => l.nom === nom);
+    const config  = TOUS_LES_LIVRES.find(l => l.nom === nom);
     const couleur = config ? config.couleur : '#888';
     const emoji   = config ? config.emoji   : '📚';
 
-    // Ajoute un tag coloré dans le cartable
     const tag = document.createElement('div');
     tag.className = 'bag-tag';
     tag.style.backgroundColor = couleur;
     tag.innerHTML = `${emoji} ${nom}`;
     document.getElementById('bag-contents').appendChild(tag);
 
-    // Si le livre fait partie des requis, coche la tâche
     if (LIVRES_REQUIS.includes(nom)) {
       const taskEl = document.getElementById('task-' + cssId(nom));
       if (taskEl) taskEl.classList.add('done');
     }
 
-    // Vérifie si tous les livres requis sont dans le cartable
     verifierVictoire();
   }
 
-  /** Teste si le jeu est terminé (les 3 bons livres sont dans le cartable) */
   function verifierVictoire() {
     const tousPresents = LIVRES_REQUIS.every(n => livresDansCartable.includes(n));
+    if (!tousPresents) return;
 
-    if (tousPresents) {
-      // Arrête le chrono
-      stopChrono();
-      tempsFinale = secondes;
+    stopChrono();
+    tempsFinale = secondes;
+    livreEnDrag = null;
 
-      // Arrête toute mécanique de drag en cours
-      cancelAnimationFrame(rafId);
-      rafId = null;
-      if (livreEnDrag) {
-        livreEnDrag.classList.remove('grabbed');
-        livreEnDrag = null;
-      }
-
-      // Petite pause pour laisser voir le dernier livre se déposer
-      setTimeout(() => goTo('devine'), 700);
-    }
+    setTimeout(() => goTo('devine'), 700);
   }
 
   /* ======================================================
-     ===== ÉCRAN 3 — DEVINE LE TROUBLE ====================
-     ====================================================== */
+     ÉCRAN 3 — DEVINE LE TROUBLE
+  ====================================================== */
 
   function initDevine() {
     reponseJoueur = null;
-
     const grid = document.getElementById('troubles-grid');
     grid.innerHTML = '';
 
-    // Mélange les troubles pour éviter un biais de position
-    const melanges = [...TROUBLES].sort(() => Math.random() - 0.5);
-
-    melanges.forEach(t => {
-      const card = document.createElement('div');
-      card.className = 'trouble-card';
-      card.innerHTML = `<span class="t-emoji">${t.emoji}</span>${t.nom}`;
-      card.addEventListener('click', () => selectionnerTrouble(t.nom, card));
-      grid.appendChild(card);
+    const shuffled = [...TROUBLES].sort(() => Math.random() - .5);
+    shuffled.forEach(t => {
+      const btn = document.createElement('button');
+      btn.className   = 'trouble-btn';
+      btn.dataset.nom = t.nom;
+      btn.innerHTML   = `<span class="t-emoji">${t.emoji}</span>${t.nom}`;
+      btn.addEventListener('click', () => selectionnerTrouble(t.nom, btn));
+      grid.appendChild(btn);
     });
 
-    // Désactive le bouton Valider jusqu'à ce qu'une réponse soit choisie
-    document.getElementById('btn-valider').disabled = true;
+    document.getElementById('btn-valider-trouble').style.display = 'none';
   }
 
-  /**
-   * Sélectionne une réponse.
-   * @param {string}      nom      - Nom du trouble
-   * @param {HTMLElement} cardEl   - Élément DOM de la carte
-   */
-  function selectionnerTrouble(nom, cardEl) {
-    // Désélectionne toutes les cartes
-    document.querySelectorAll('.trouble-card').forEach(c => c.classList.remove('selected'));
-    // Sélectionne celle-ci
-    cardEl.classList.add('selected');
+  function selectionnerTrouble(nom, btnEl) {
+    document.querySelectorAll('.trouble-btn').forEach(b => b.classList.remove('selected'));
+    btnEl.classList.add('selected');
     reponseJoueur = nom;
-    // Active le bouton Valider
-    document.getElementById('btn-valider').disabled = false;
+    document.getElementById('btn-valider-trouble').style.display = 'inline-flex';
   }
 
-  function validerReponse() {
+  function validerTrouble() {
     if (!reponseJoueur) return;
-    goTo('score');
+
+    const correct = reponseJoueur === TROUBLE_CORRECT;
+
+    document.querySelectorAll('.trouble-btn').forEach(btn => {
+      btn.disabled = true;
+      if (btn.dataset.nom === TROUBLE_CORRECT) btn.classList.add('correct');
+      else if (btn.dataset.nom === reponseJoueur && !correct) btn.classList.add('wrong');
+    });
+
+    document.getElementById('btn-valider-trouble').style.display = 'none';
+
+    setTimeout(() => goTo('score'), 1200);
   }
 
   /* ======================================================
-     ===== ÉCRAN 4 — SCORE & EXPLICATION ==================
-     ====================================================== */
+     ÉCRAN 4 — SCORE
+  ====================================================== */
 
   function initScore() {
-    // ---- Calcul du score ----
     const scoreTemps = Math.max(0, SCORE_TEMPS_MAX - tempsFinale * PENALITE_PAR_SECONDE);
-    const estCorrect = (reponseJoueur === TROUBLE_CORRECT);
-    const bonusId    = estCorrect ? BONUS_IDENTIFICATION : 0;
-    const scoreTotal = scoreTemps + bonusId;
+    const scoreId    = reponseJoueur === TROUBLE_CORRECT ? BONUS_IDENTIFICATION : 0;
+    const scoreTotal = scoreTemps + scoreId;
 
-    // ---- Mise à jour des chips de détail ----
-    document.getElementById('chip-temps').textContent =
-      `⏱️ Temps : ${scoreTemps} pts (${tempsFinale}s)`;
+    const mm = String(Math.floor(tempsFinale / 60)).padStart(2, '0');
+    const ss = String(tempsFinale % 60).padStart(2, '0');
+    document.getElementById('score-temps-display').textContent          = mm + ':' + ss;
+    document.getElementById('score-identification-display').textContent = scoreId + ' pts';
 
-    document.getElementById('chip-bonus').textContent =
-      estCorrect
-        ? `🧠 Identification : +${BONUS_IDENTIFICATION} pts ✅`
-        : `🧠 Identification : +0 pt ❌`;
+    const badgeContainer = document.getElementById('result-badge-container');
+    badgeContainer.innerHTML = reponseJoueur === TROUBLE_CORRECT
+      ? `<span class="result-badge correct">✅ Bonne réponse !</span>`
+      : `<span class="result-badge wrong">❌ C'était la Dyspraxie</span>`;
 
-    // ---- Badge résultat ----
-    const badgeZone = document.getElementById('result-badge-zone');
-    if (estCorrect) {
-      badgeZone.innerHTML = `
-        <div class="result-badge correct">
-          ✅ Bravo ! Tu as bien identifié la <strong>Dyspraxie</strong> !
-        </div>`;
-    } else {
-      badgeZone.innerHTML = `
-        <div class="result-badge wrong">
-          ❌ La bonne réponse était <strong>${TROUBLE_CORRECT}</strong>
-          — tu as répondu : <em>${reponseJoueur || '—'}</em>
-        </div>`;
-    }
-
-    // ---- Texte pédagogique ----
-    document.getElementById('explication-texte').textContent      = EXPLICATION_TROUBLE;
+    document.getElementById('explication-texte').textContent        = EXPLICATION_TROUBLE;
     document.getElementById('explication-source-texte').textContent = EXPLICATION_SOURCE;
 
-    // ---- Animation du compteur de score ----
-    animerCompteur(
-      document.getElementById('score-final-display'),
-      0,
-      scoreTotal,
-      1400  // durée en ms
-    );
-
-    // Remonte en haut de l'écran (utile si l'explication est longue)
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    animerCompteur(document.getElementById('score-final-display'), 0, scoreTotal, 1400);
   }
 
-  /**
-   * Anime un élément texte de startVal à endVal en dureMs millisecondes.
-   * Utilise un easing easeOutCubic pour un effet naturel.
-   *
-   * @param {HTMLElement} el
-   * @param {number}      startVal
-   * @param {number}      endVal
-   * @param {number}      dureMs
-   */
   function animerCompteur(el, startVal, endVal, dureMs) {
     const debut = performance.now();
-
-    function step(maintenant) {
-      const progress = Math.min((maintenant - debut) / dureMs, 1);
-      // Easing easeOutCubic : ralentit vers la fin
-      const eased = 1 - Math.pow(1 - progress, 3);
+    function step(now) {
+      const progress = Math.min((now - debut) / dureMs, 1);
+      const eased    = 1 - Math.pow(1 - progress, 3);
       el.textContent = Math.round(startVal + (endVal - startVal) * eased);
       if (progress < 1) requestAnimationFrame(step);
     }
-
     requestAnimationFrame(step);
   }
 
   /* ======================================================
-     ===== REJOUER ========================================
-     ====================================================== */
+     REJOUER
+  ====================================================== */
 
-  /** Remet tout à zéro et retourne à l'écran d'accueil */
   function rejouer() {
     stopChrono();
-    cancelAnimationFrame(rafId);
-    rafId = null;
+    arreterCurseurVirtuel();
     livreEnDrag        = null;
     livresDansCartable = [];
     reponseJoueur      = null;
     secondes           = 0;
     tempsFinale        = 0;
-    forceStatX         = 0;
-    forceStatY         = 0;
     goTo('accueil');
   }
 
   /* ======================================================
-     ===== UTILITAIRES ====================================
-     ====================================================== */
+     UTILITAIRES
+  ====================================================== */
 
-  /**
-   * Transforme un nom de livre en identifiant CSS valide.
-   * Ex: "Géographie" → "gographie"
-   * @param {string} str
-   * @returns {string}
-   */
   function cssId(str) {
     return str.toLowerCase().replace(/[^a-z0-9]/g, '');
   }
 
   </script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"8607d2a720d14b038279025b2b5a82e5","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
