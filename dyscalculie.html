@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vivre la Dyscalculie</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tempstyle.css">
+</head>
+<body>
+<header>
+  <h1>Vivre les "Dys"</h1>
+  <span class="badge">Serious Game</span>
+</header>
+
+<!-- HOME -->
+<div id="screen-home" class="screen active">
+  <div class="home-hero fade-in">
+    <h2>Ressentir ce que <span>les autres</span> vivent chaque jour</h2>
+    <p>Deux mini-jeux pour comprendre de l'intérieur les défis quotidiens d'un élève dyscalculique. Aucune triche possible — vous allez juste… essayer.</p>
+  </div>
+  <div class="game-cards fade-in">
+    <div class="game-card card-1" onclick="startGame1()">
+      <div class="card-icon">🔐</div>
+      <div class="card-num">Mini-jeu 01</div>
+      <div class="card-title">La perte des repères</div>
+      <div class="card-desc">Déverrouillez un coffre-fort en résolvant trois équations… dont les chiffres ont été remplacés par des glyphes inconnus.</div>
+      <button class="card-btn" onclick="event.stopPropagation();startGame1()">Jouer →</button>
+    </div>
+    <div class="game-card card-2" onclick="startGame2()">
+      <div class="card-icon">🐑</div>
+      <div class="card-num">Mini-jeu 02</div>
+      <div class="card-title">L'estimation impossible</div>
+      <div class="card-desc">Combien de moutons dans l'enclos ? Comptez vite — ils bougent, se cachent, changent… et le temps presse.</div>
+      <button class="card-btn" onclick="event.stopPropagation();startGame2()">Jouer →</button>
+    </div>
+  </div>
+</div>
+
+<!-- GAME 1 -->
+<div id="screen-g1" class="screen">
+  <div id="g1-intro" class="panel fade-in" style="width:100%;">
+    <div class="game-header" style="margin-bottom:20px;">
+      <button class="back-btn" onclick="goHome()">← Accueil</button>
+      <span class="game-title-bar">🔐 La perte des repères symboliques</span>
+    </div>
+    <p style="margin-bottom:10px;">Vous êtes détective. Vous devez ouvrir un coffre-fort en résolvant <strong>3 opérations</strong>.</p>
+    <p style="margin-bottom:10px;">Dans ces équations, <strong>certains chiffres sont remplacés par des glyphes</strong>. Une table de correspondance sera visible en permanence sur le côté… mais les calculs restent piégeux.</p>
+    <p style="color:var(--muted);font-size:0.88rem;margin-bottom:20px;">Les opérateurs (+, −, ×) restent normaux. Seuls les chiffres changent.</p>
+    <button class="btn-primary" onclick="g1Start()">Commencer →</button>
+  </div>
+
+  <div id="g1-play" class="hidden fade-in" style="width:100%;">
+    <div class="game-header" style="margin-bottom:20px;">
+      <button class="back-btn" onclick="goHome()">← Accueil</button>
+      <span class="game-title-bar">🔐 Déverrouillez le coffre</span>
+    </div>
+    <div class="g1-layout">
+      <!-- LEFT: legend (always visible) -->
+      <div class="legend-box" style="align-self:start;">
+        <div class="legend-title">Table de correspondance</div>
+        <div class="legend-grid" id="g1-legend-grid"></div>
+      </div>
+      <!-- RIGHT: game -->
+      <div class="g1-right">
+        <div class="panel" style="text-align:center;width:100%;">
+          <div class="safe-display" id="g1-safe">🔒</div>
+          <div class="combo-slots">
+            <div class="combo-slot" id="cs0">?</div>
+            <div class="combo-slot" id="cs1">?</div>
+            <div class="combo-slot" id="cs2">?</div>
+          </div>
+        </div>
+        <div class="panel" style="display:flex;flex-direction:column;gap:12px;align-items:center;width:100%;">
+          <div class="progress-dots">
+            <div class="dot current" id="d0"></div>
+            <div class="dot" id="d1"></div>
+            <div class="dot" id="d2"></div>
+          </div>
+          <div class="round-label" id="g1-round-lbl">Équation 1 / 3</div>
+          <div class="equation-display" id="g1-equation">…</div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <span style="color:var(--muted);font-size:0.9rem;">= </span>
+            <input class="answer-input" id="g1-input" type="number" placeholder="?" autocomplete="off" min="0" max="99">
+            <button class="btn-primary" onclick="g1CheckAnswer()" style="padding:12px 20px;">✓</button>
+          </div>
+          <div class="feedback-msg" id="g1-feedback"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="g1-result" class="hidden fade-in" style="width:100%;display:flex;flex-direction:column;gap:16px;align-items:center;">
+    <div class="game-header"><button class="back-btn" onclick="goHome()">← Accueil</button></div>
+    <div class="result-emoji">🔓</div>
+    <div class="result-title">Coffre déverrouillé !</div>
+    <div class="result-sub" id="g1-result-sub"></div>
+    <div class="debrief-box">
+      <h3>💡 Ce que ça illustre</h3>
+      <p>Pour un élève dyscalculique, <strong>les chiffres arabes ne s'automatisent pas</strong>. Chaque symbole demande un effort de décodage conscient — exactement comme vous venez de vivre avec les glyphes.</p>
+      <p>Même avec la légende sous les yeux, la surcharge cognitive est réelle : il faut décoder, retenir, calculer, re-décoder. Ce n'est pas un manque d'intelligence : c'est ce que vivent ces élèves à chaque calcul, chaque jour.</p>
+    </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
+      <button class="btn-primary" onclick="g1Restart()">Rejouer</button>
+      <button class="btn-ghost" onclick="startGame2()">Mini-jeu 2 →</button>
+    </div>
+  </div>
+</div>
+
+<!-- GAME 2 -->
+<div id="screen-g2" class="screen">
+  <div id="g2-intro" class="panel fade-in" style="width:100%;">
+    <div class="game-header" style="margin-bottom:20px;">
+      <button class="back-btn" onclick="goHome()">← Accueil</button>
+      <span class="game-title-bar">🐑 L'estimation impossible</span>
+    </div>
+    <p style="color:var(--muted);line-height:1.65;font-size:0.92rem;margin-bottom:12px;">Des moutons apparaissent dans l'enclos. Vous devez <strong style="color:var(--amber);">compter leur nombre exact</strong> avant qu'ils ne s'échappent.</p>
+    <p style="color:var(--muted);line-height:1.65;font-size:0.92rem;margin-bottom:12px;">Ils sont grands, se chevauchent, bougent en permanence. Impossible de les "voir" globalement — il faut pointer et compter <em>un par un</em>, sous contrainte de temps.</p>
+    <p style="color:var(--muted);line-height:1.65;font-size:0.92rem;margin-bottom:20px;"><strong style="color:var(--teal);">3 manches</strong> — à chaque manche, le nombre de moutons change.</p>
+    <button class="btn-primary" onclick="g2Init()">Commencer →</button>
+  </div>
+
+  <div id="g2-play" class="hidden fade-in" style="width:100%;display:flex;flex-direction:column;gap:14px;align-items:center;">
+    <div class="game-header">
+      <button class="back-btn" onclick="goHome()">← Accueil</button>
+      <span class="game-title-bar">🐑 Combien de moutons ?</span>
+    </div>
+    <div style="width:100%;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+      <div class="round-label" id="g2-round-lbl">Manche 1 / 3</div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:0.8rem;color:var(--muted);">Temps :</span>
+        <span id="g2-time-num" style="font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--amber);font-size:1rem;">8</span>
+        <span style="font-size:0.8rem;color:var(--muted);">s</span>
+      </div>
+    </div>
+    <div id="g2-timer-bar-wrap"><div id="g2-timer-bar"></div></div>
+
+    <div id="g2-field">
+      <div class="fence-h top"></div>
+      <div class="fence-h bottom"></div>
+      <div class="fence-v left"></div>
+      <div class="fence-v right"></div>
+      <div id="g2-overlay">
+        <h3 id="g2-overlay-title">🐑 Prêt ?</h3>
+        <p id="g2-overlay-msg">Les moutons vont apparaître. Comptez-les !</p>
+        <button class="btn-primary" onclick="g2StartRound()" style="font-size:0.9rem;padding:10px 24px;">C'est parti !</button>
+      </div>
+      <div id="g2-sheep-container"></div>
+    </div>
+
+    <div class="g2-controls">
+      <button class="count-btn" id="g2-minus" onclick="g2Adjust(-1)" disabled>−</button>
+      <div id="g2-count-display">0</div>
+      <button class="count-btn" id="g2-plus" onclick="g2Adjust(1)" disabled>+</button>
+      <button id="g2-submit" onclick="g2Submit()" disabled>Valider →</button>
+    </div>
+    <div class="feedback-msg" id="g2-feedback"></div>
+    <div class="g2-score-row">
+      <div class="score-badge"><div class="num" id="g2-correct-num">0</div><div class="lbl">Bonnes réponses</div></div>
+      <div class="score-badge"><div class="num" id="g2-total-num">0</div><div class="lbl">Manches jouées</div></div>
+    </div>
+  </div>
+
+  <div id="g2-result" class="hidden fade-in" style="width:100%;display:flex;flex-direction:column;gap:16px;align-items:center;">
+    <div class="game-header"><button class="back-btn" onclick="goHome()">← Accueil</button></div>
+    <div class="result-emoji" id="g2-result-emoji">🐑</div>
+    <div class="result-title" id="g2-result-title">Résultat</div>
+    <div class="result-sub" id="g2-result-sub"></div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
+      <button class="btn-primary" onclick="goQCM()">Et maintenant… devinez ! →</button>
+      <button class="btn-ghost" onclick="g2Restart()">Rejouer</button>
+    </div>
+  </div>
+</div>
+
+<!-- QCM -->
+<div id="screen-qcm" class="screen">
+  <div class="panel fade-in" style="width:100%;display:flex;flex-direction:column;gap:20px;">
+    <div class="game-header">
+      <button class="back-btn" onclick="goHome()">← Accueil</button>
+      <span class="game-title-bar">🧠 À vous de diagnostiquer</span>
+    </div>
+    <p style="color:var(--muted);line-height:1.65;font-size:0.93rem;">
+      Vous venez de vivre deux expériences : des chiffres impossibles à lire automatiquement, et des quantités impossibles à percevoir d'un coup d'œil.<br><br>
+      <strong style="color:var(--text);">Quel trouble des apprentissages ces deux jeux cherchaient-ils à simuler ?</strong>
+    </p>
+    <div id="qcm-options" style="display:flex;flex-direction:column;gap:10px;"></div>
+    <div id="qcm-feedback" class="hidden" style="margin-top:4px;"></div>
+  </div>
+</div>
+
+<script>
+// ── NAVIGATION ──────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function goHome() { g1Cleanup(); g2Cleanup(); showScreen('screen-home'); }
+
+// ── GAME 1 ──────────────────────────────────────
+const GLYPHS = { 0:'○',1:'◆',2:'▲',3:'✦',4:'⬟',5:'⬡',6:'✿',7:'⟁',8:'⌬',9:'❋' };
+
+// Equations: mix glyphs AND arabic digits in the same equation
+const G1_EQUATIONS = [
+  { aParts:[{v:2,glyph:true}],   op:'+', bParts:[{v:3,glyph:false}],  ans:5  },
+  { aParts:[{v:7,glyph:false}],  op:'−', bParts:[{v:4,glyph:true}],   ans:3  },
+  { aParts:[{v:2,glyph:true}],   op:'×', bParts:[{v:4,glyph:true}],   ans:8  },
+];
+
+let g1Step=0, g1ComboAnswers=[], g1LegendInt=null;
+
+function startGame1() {
+  g1Step=0; g1ComboAnswers=[];
+  ['g1-intro','g1-play','g1-result'].forEach(id=>document.getElementById(id).classList.add('hidden'));
+  document.getElementById('g1-intro').classList.remove('hidden');
+  showScreen('screen-g1');
+}
+
+function g1ShowOnly(id) {
+  ['g1-intro','g1-play','g1-result'].forEach(i=>document.getElementById(i).classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+}
+
+function g1BuildLegend() {
+  const grid = document.getElementById('g1-legend-grid');
+  grid.innerHTML = '';
+  [0,1,2,3,4,5,6,7,8,9].forEach(d => {
+    const item = document.createElement('div');
+    item.className = 'legend-item';
+    item.innerHTML = `<span class="glyph-sym">${GLYPHS[d]}</span><span class="glyph-eq">=</span><span class="glyph-num">${d}</span>`;
+    grid.appendChild(item);
+  });
+}
+
+function g1Start() {
+  g1BuildLegend();
+  g1ShowOnly('g1-play');
+  // Reset combo slots
+  [0,1,2].forEach(i => {
+    const s = document.getElementById('cs'+i);
+    s.textContent='?'; s.className='combo-slot';
+  });
+  document.getElementById('g1-safe').textContent='🔒';
+  g1Step=0; g1ComboAnswers=[];
+  g1UpdateDots();
+  g1LoadEquation();
+  document.getElementById('g1-input').focus();
+}
+
+function renderParts(parts) {
+  return parts.map(p => p.glyph
+    ? `<span class="eq-glyph">${GLYPHS[p.v]}</span>`
+    : `<span class="eq-num">${p.v}</span>`
+  ).join('');
+}
+
+function g1LoadEquation() {
+  const eq = G1_EQUATIONS[g1Step];
+  document.getElementById('g1-equation').innerHTML =
+    `${renderParts(eq.aParts)} <span class="eq-op">${eq.op}</span> ${renderParts(eq.bParts)}`;
+  document.getElementById('g1-round-lbl').textContent = `Équation ${g1Step+1} / 3`;
+  const inp = document.getElementById('g1-input');
+  inp.value=''; inp.className='answer-input';
+  document.getElementById('g1-feedback').textContent='';
+  inp.focus();
+}
+
+function g1UpdateDots() {
+  for(let i=0;i<3;i++){
+    const d=document.getElementById('d'+i);
+    d.className='dot';
+    if(i<g1Step) d.classList.add('done');
+    else if(i===g1Step) d.classList.add('current');
+  }
+}
+
+function g1CheckAnswer() {
+  const inp=document.getElementById('g1-input');
+  const val=parseInt(inp.value);
+  const correct=G1_EQUATIONS[g1Step].ans;
+  const fb=document.getElementById('g1-feedback');
+  if(isNaN(val)){fb.textContent='Entre un nombre !';fb.className='feedback-msg err';return;}
+  if(val===correct){
+    inp.className='answer-input correct';
+    fb.textContent='✓ Correct !'; fb.className='feedback-msg ok';
+    const slot=document.getElementById('cs'+g1Step);
+    slot.textContent=correct; slot.classList.add('filled');
+    g1ComboAnswers.push(correct);
+    g1Step++;
+    g1UpdateDots();
+    if(g1Step>=3) setTimeout(g1Win,700);
+    else setTimeout(g1LoadEquation,600);
+  } else {
+    inp.className='answer-input wrong';
+    fb.textContent='✗ Pas tout à fait… réessaie.'; fb.className='feedback-msg err';
+    setTimeout(()=>{ inp.className='answer-input'; inp.select(); },400);
+  }
+}
+
+function g1Win() {
+  document.getElementById('g1-safe').textContent='🔓';
+  setTimeout(()=>{
+    g1ShowOnly('g1-result');
+    document.getElementById('g1-result-sub').textContent=`Combinaison : ${g1ComboAnswers.join(' – ')}`;
+  },800);
+}
+
+function g1Restart(){ g1Cleanup(); g1Start(); }
+function g1Cleanup(){ if(g1LegendInt) clearInterval(g1LegendInt); }
+
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('g1-input').addEventListener('keydown',e=>{ if(e.key==='Enter') g1CheckAnswer(); });
+});
+
+// ── GAME 2 ──────────────────────────────────────
+// Counts: big enough to make it hard (7-10)
+const G2_COUNTS = [8, 10, 7];
+const G2_ROUND_TIME = 8;
+
+let g2Round=0, g2UserCount=0, g2Correct=0, g2Total=0;
+let g2TimerInt=null, g2TimeLeft=G2_ROUND_TIME;
+let g2AnimFrame=null, g2RoundActive=false;
+let g2Sheep=[]; // [{el,x,y,vx,vy,phase,size,zIndex}]
+
+function startGame2() {
+  g2Round=0; g2Correct=0; g2Total=0;
+  ['g2-intro','g2-play','g2-result'].forEach(id=>document.getElementById(id).classList.add('hidden'));
+  document.getElementById('g2-intro').classList.remove('hidden');
+  showScreen('screen-g2');
+}
+
+function g2ShowOnly(id){
+  ['g2-intro','g2-play','g2-result'].forEach(i=>document.getElementById(i).classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+}
+
+function g2Init(){
+  g2Round=0; g2Correct=0; g2Total=0;
+  g2ShowOnly('g2-play');
+  g2PrepareRound();
+}
+
+function g2PrepareRound(){
+  g2RoundActive=false; g2UserCount=0;
+  document.getElementById('g2-count-display').textContent='0';
+  document.getElementById('g2-feedback').textContent='';
+  document.getElementById('g2-round-lbl').textContent=`Manche ${g2Round+1} / 3`;
+  document.getElementById('g2-time-num').textContent=G2_ROUND_TIME;
+  const bar=document.getElementById('g2-timer-bar');
+  bar.style.width='100%';
+  bar.style.background='linear-gradient(90deg,var(--teal),var(--amber))';
+  document.getElementById('g2-submit').disabled=true;
+  document.getElementById('g2-minus').disabled=true;
+  document.getElementById('g2-plus').disabled=true;
+  document.getElementById('g2-correct-num').textContent=g2Correct;
+  document.getElementById('g2-total-num').textContent=g2Total;
+  document.getElementById('g2-sheep-container').innerHTML='';
+
+  const overlay=document.getElementById('g2-overlay');
+  overlay.style.display='flex';
+  document.getElementById('g2-overlay-title').textContent=`🐑 Manche ${g2Round+1}`;
+  document.getElementById('g2-overlay-msg').textContent=`Des moutons vont apparaître. Comptez-les vite !`;
+}
+
+function g2StartRound(){
+  document.getElementById('g2-overlay').style.display='none';
+  g2RoundActive=true; g2UserCount=0;
+  g2SpawnSheep(G2_COUNTS[g2Round]);
+  document.getElementById('g2-submit').disabled=false;
+  document.getElementById('g2-minus').disabled=false;
+  document.getElementById('g2-plus').disabled=false;
+  g2TimeLeft=G2_ROUND_TIME;
+  if(g2TimerInt) clearInterval(g2TimerInt);
+  g2TimerInt=setInterval(()=>{
+    g2TimeLeft-=0.1;
+    const pct=Math.max(0,(g2TimeLeft/G2_ROUND_TIME)*100);
+    const bar=document.getElementById('g2-timer-bar');
+    bar.style.width=pct+'%';
+    document.getElementById('g2-time-num').textContent=Math.max(0,Math.ceil(g2TimeLeft));
+    if(pct<30) bar.style.background='var(--red)';
+    else if(pct<60) bar.style.background='var(--amber)';
+    if(g2TimeLeft<=0){ clearInterval(g2TimerInt); if(g2RoundActive) g2TimeOut(); }
+  },100);
+}
+
+function g2SpawnSheep(count){
+  const container=document.getElementById('g2-sheep-container');
+  container.innerHTML=''; g2Sheep=[];
+  const field=document.getElementById('g2-field');
+  const fw=field.clientWidth-30;
+  const fh=field.clientHeight-30;
+
+  const emojis=['🐑','🐑','🐑','🐏'];
+
+  for(let i=0;i<count;i++){
+    const el=document.createElement('div');
+    el.className='sheep';
+    // Size varies a lot: 42–70px — makes them overlap and hard to distinguish
+    const size=42+Math.floor(Math.random()*30);
+    el.style.fontSize=size+'px';
+    el.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+
+    const x=18+Math.random()*(fw-size);
+    const y=18+Math.random()*(fh-size);
+    el.style.left=x+'px'; el.style.top=y+'px';
+    el.style.zIndex=Math.floor(Math.random()*10);
+
+    const angle=Math.random()*Math.PI*2;
+    const speed=0.6+Math.random()*1.0;
+    container.appendChild(el);
+    g2Sheep.push({el,x,y,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,phase:Math.random()*Math.PI*2,size,fw,fh});
+  }
+  g2Animate();
+}
+
+function g2Animate(){
+  if(g2AnimFrame) cancelAnimationFrame(g2AnimFrame);
+  let t=0;
+  function step(){
+    if(!g2RoundActive) return;
+    t++;
+    g2Sheep.forEach(s=>{
+      // Slight random direction change
+      s.vx+=(Math.random()-0.5)*0.12;
+      s.vy+=(Math.random()-0.5)*0.12;
+      const spd=Math.sqrt(s.vx*s.vx+s.vy*s.vy);
+      const maxSpd=1.6;
+      if(spd>maxSpd){s.vx=s.vx/spd*maxSpd;s.vy=s.vy/spd*maxSpd;}
+
+      s.x+=s.vx; s.y+=s.vy;
+      const margin=16;
+      if(s.x<margin){s.x=margin;s.vx=Math.abs(s.vx);}
+      if(s.x>s.fw-s.size){s.x=s.fw-s.size;s.vx=-Math.abs(s.vx);}
+      if(s.y<margin){s.y=margin;s.vy=Math.abs(s.vy);}
+      if(s.y>s.fh-s.size){s.y=s.fh-s.size;s.vy=-Math.abs(s.vy);}
+      s.el.style.left=s.x+'px'; s.el.style.top=s.y+'px';
+
+      // Randomly swap z-index so they pass in front/behind each other
+      if(t%30===Math.floor(s.phase*5)%30){
+        s.el.style.zIndex=Math.floor(Math.random()*20);
+      }
+    });
+    g2AnimFrame=requestAnimationFrame(step);
+  }
+  g2AnimFrame=requestAnimationFrame(step);
+}
+
+function g2Adjust(delta){
+  if(!g2RoundActive) return;
+  g2UserCount=Math.max(0,g2UserCount+delta);
+  document.getElementById('g2-count-display').textContent=g2UserCount;
+}
+
+function g2Submit(){
+  if(!g2RoundActive) return;
+  clearInterval(g2TimerInt);
+  g2RoundActive=false;
+  if(g2AnimFrame) cancelAnimationFrame(g2AnimFrame);
+  // freeze sheep
+  g2Sheep.forEach(s=>{ s.el.style.filter='grayscale(1) brightness(0.35)'; });
+  g2EvaluateAnswer();
+}
+
+function g2TimeOut(){
+  g2RoundActive=false;
+  if(g2AnimFrame) cancelAnimationFrame(g2AnimFrame);
+  g2Sheep.forEach(s=>{ s.el.style.filter='grayscale(1) brightness(0.35)'; });
+  const fb=document.getElementById('g2-feedback');
+  fb.textContent='⏱ Temps écoulé !'; fb.className='feedback-msg err';
+  g2Total++;
+  document.getElementById('g2-total-num').textContent=g2Total;
+  document.getElementById('g2-submit').disabled=true;
+  // reveal correct count after a brief pause
+  setTimeout(()=>{
+    fb.textContent=`⏱ Temps écoulé ! Il y en avait ${G2_COUNTS[g2Round]}.`;
+    setTimeout(()=>g2NextRound(),1800);
+  },300);
+}
+
+function g2EvaluateAnswer(){
+  const correct=G2_COUNTS[g2Round];
+  const fb=document.getElementById('g2-feedback');
+  g2Total++;
+  if(g2UserCount===correct){
+    g2Correct++;
+    fb.textContent=`✓ Exact ! ${correct} mouton${correct>1?'s':''}. 🎉`; fb.className='feedback-msg ok';
+  } else {
+    fb.textContent=`✗ Il y en avait ${correct} — vous avez dit ${g2UserCount}.`; fb.className='feedback-msg err';
+  }
+  document.getElementById('g2-correct-num').textContent=g2Correct;
+  document.getElementById('g2-total-num').textContent=g2Total;
+  document.getElementById('g2-submit').disabled=true;
+  setTimeout(()=>g2NextRound(),2000);
+}
+
+function g2NextRound(){
+  g2Round++;
+  if(g2Round>=G2_COUNTS.length) g2ShowResult();
+  else g2PrepareRound();
+}
+
+function g2ShowResult(){
+  g2ShowOnly('g2-result');
+  const pct=g2Correct/g2Total;
+  let emoji='😓',title="C'était difficile…";
+  if(pct===1){emoji='🏆';title='Impressionnant !';}
+  else if(pct>=0.66){emoji='👏';title='Pas mal du tout !';}
+  document.getElementById('g2-result-emoji').textContent=emoji;
+  document.getElementById('g2-result-title').textContent=title;
+  document.getElementById('g2-result-sub').textContent=
+    `${g2Correct} bonne${g2Correct>1?'s':''} réponse${g2Correct>1?'s':''} sur ${g2Total} manches. Imagine ressentir ça pour chaque quantité, chaque jour.`;
+}
+
+function g2Restart(){ g2Cleanup(); startGame2(); setTimeout(g2Init,100); }
+function g2Cleanup(){
+  if(g2TimerInt) clearInterval(g2TimerInt);
+  if(g2AnimFrame) cancelAnimationFrame(g2AnimFrame);
+  g2RoundActive=false;
+}
+
+// ── QCM ─────────────────────────────────────────
+const QCM_OPTIONS = [
+  {
+    letter: 'A',
+    label: 'La dyslexie',
+    sub: 'Trouble de la lecture et du décodage des mots écrits',
+    correct: false,
+    explain: 'La dyslexie affecte principalement la lecture et le décodage des mots écrits. Elle ne cible pas spécifiquement les chiffres ni la perception des quantités.'
+  },
+  {
+    letter: 'B',
+    label: 'La dyscalculie',
+    sub: 'Trouble de l\'acquisition et de la manipulation des nombres',
+    correct: true,
+    explain: null
+  },
+  {
+    letter: 'C',
+    label: 'La dyspraxie',
+    sub: 'Trouble de la coordination et de la planification des gestes',
+    correct: false,
+    explain: 'La dyspraxie (ou trouble développemental de la coordination) affecte la motricité et la planification des gestes. Elle n\'est pas liée à la lecture des symboles numériques ni à la perception des quantités.'
+  },
+  {
+    letter: 'D',
+    label: 'La dysorthographie',
+    sub: 'Trouble persistant de l\'acquisition de l\'orthographe',
+    correct: false,
+    explain: 'La dysorthographie concerne la production écrite et l\'orthographe. Elle est souvent associée à la dyslexie, mais n\'implique pas les difficultés avec les nombres et les quantités.'
+  },
+  {
+    letter: 'E',
+    label: 'La dysphasie',
+    sub: 'Trouble structurel du langage oral',
+    correct: false,
+    explain: 'La dysphasie est un trouble du développement du langage oral. Elle touche la compréhension et la production de la parole, pas le traitement des chiffres ou des quantités.'
+  },
+];
+
+function goQCM() {
+  showScreen('screen-qcm');
+  const container = document.getElementById('qcm-options');
+  container.innerHTML = '';
+  document.getElementById('qcm-feedback').classList.add('hidden');
+
+  // Shuffle options
+  const shuffled = [...QCM_OPTIONS].sort(() => Math.random() - 0.5);
+
+  shuffled.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'qcm-option';
+    btn.innerHTML = `
+      <div class="qcm-letter">${String.fromCharCode(65+i)}</div>
+      <div class="qcm-text">
+        <div>${opt.label}</div>
+        <div class="qcm-sub">${opt.sub}</div>
+      </div>`;
+    btn.addEventListener('click', () => qcmAnswer(opt, btn, shuffled));
+    container.appendChild(btn);
+  });
+}
+
+function qcmAnswer(opt, clickedBtn, shuffled) {
+  // Disable all buttons
+  document.querySelectorAll('.qcm-option').forEach(b => b.disabled = true);
+
+  const fb = document.getElementById('qcm-feedback');
+  fb.classList.remove('hidden');
+
+  if(opt.correct) {
+    clickedBtn.classList.add('correct');
+    fb.innerHTML = `
+      <div class="qcm-reveal">
+        <h3>✓ Bonne réponse — c'est la dyscalculie !</h3>
+        <p>La <strong>dyscalculie</strong> est un trouble neurodéveloppemental spécifique qui affecte la capacité à traiter et manipuler les nombres. Elle touche :</p>
+        <p>— L'<strong>automatisation des symboles numériques</strong> (jeu 1) : les chiffres arabes ne deviennent jamais "évidents", chaque lecture coûte un effort cognitif.</p>
+        <p>— Le <strong>subitizing</strong> (jeu 2) : la perception instantanée des petites quantités est absente ou très déficiente, forçant un comptage un par un même pour 3 objets.</p>
+        <p style="margin-top:8px;">Ce n'est <em>pas</em> un manque de travail ou d'intelligence. C'est un fonctionnement neurologique différent, permanent, qui demande des adaptations pédagogiques spécifiques.</p>
+        <div style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap;">
+          <button class="btn-primary" onclick="goHome()">← Accueil</button>
+          <button class="btn-ghost" onclick="g2Restart()">Rejouer le jeu 2</button>
+        </div>
+      </div>`;
+  } else {
+    clickedBtn.classList.add('wrong');
+    // Highlight correct answer
+    document.querySelectorAll('.qcm-option').forEach((b, i) => {
+      if(shuffled[i].correct) b.classList.add('correct');
+    });
+    fb.innerHTML = `
+      <div class="qcm-reveal wrong-reveal">
+        <h3>✗ Pas tout à fait…</h3>
+        <p>${opt.explain}</p>
+        <p>La bonne réponse est la <strong style="color:var(--teal);">dyscalculie</strong> — un trouble spécifique du traitement des nombres qui rend difficiles à la fois la lecture automatique des symboles numériques et la perception instantanée des quantités (le <em>subitizing</em>).</p>
+        <div style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap;">
+          <button class="btn-primary" onclick="goHome()">← Accueil</button>
+          <button class="btn-ghost" onclick="goQCM()">Réessayer le QCM</button>
+        </div>
+      </div>`;
+  }
+}
+</script>
+</body>
+</html>
