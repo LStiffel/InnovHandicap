@@ -203,14 +203,46 @@ function showScreen(id) {
 function goHome() { g1Cleanup(); g2Cleanup(); showScreen('screen-home'); }
 
 // ── GAME 1 ──────────────────────────────────────
-const GLYPHS = { 0:'○',1:'◆',2:'▲',3:'✦',4:'⬟',5:'⬡',6:'✿',7:'⟁',8:'⌬',9:'❋' };
+const SYMBOLS = ['○','◆','▲','✦','⬟','⬡','✿','⟁','⌬','❋'];
+let GLYPHS = {}; // digit -> symbol, reshuffled at each equation
 
-// Equations: mix glyphs AND arabic digits in the same equation
-const G1_EQUATIONS = [
-  { aParts:[{v:2,glyph:true}],   op:'+', bParts:[{v:3,glyph:false}],  ans:5  },
-  { aParts:[{v:7,glyph:false}],  op:'−', bParts:[{v:4,glyph:true}],   ans:3  },
-  { aParts:[{v:2,glyph:true}],   op:'×', bParts:[{v:4,glyph:true}],   ans:8  },
-];
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function randInt(min, max) { return min + Math.floor(Math.random() * (max - min + 1)); }
+
+function g1ShuffleGlyphs() {
+  const s = shuffle(SYMBOLS);
+  GLYPHS = {};
+  s.forEach((sym, d) => { GLYPHS[d] = sym; });
+}
+
+// Random equations mixing glyphs AND arabic digits; answers stay single-digit (safe combination)
+function g1GenerateEquations() {
+  const gen = {
+    '+': () => { const ans = randInt(2, 9), a = randInt(1, ans - 1); return { a, b: ans - a, ans }; },
+    '−': () => { const a = randInt(2, 9), b = randInt(1, a - 1); return { a, b, ans: a - b }; },
+    '×': () => {
+      const pairs = [];
+      for (let a = 2; a <= 4; a++) for (let b = 2; a * b <= 9; b++) pairs.push([a, b]);
+      const [a, b] = pairs[randInt(0, pairs.length - 1)];
+      return { a, b, ans: a * b };
+    },
+  };
+  return shuffle(['+', '−', '×']).map(op => {
+    const { a, b, ans } = gen[op]();
+    // At least one glyph per equation
+    const flags = [[true, false], [false, true], [true, true]][randInt(0, 2)];
+    return { aParts: [{ v: a, glyph: flags[0] }], op, bParts: [{ v: b, glyph: flags[1] }], ans };
+  });
+}
+
+let G1_EQUATIONS = [];
 
 let g1Step=0, g1ComboAnswers=[], g1LegendInt=null;
 
@@ -238,7 +270,7 @@ function g1BuildLegend() {
 }
 
 function g1Start() {
-  g1BuildLegend();
+  G1_EQUATIONS = g1GenerateEquations();
   g1ShowOnly('g1-play');
   // Reset combo slots
   [0,1,2].forEach(i => {
@@ -261,6 +293,8 @@ function renderParts(parts) {
 
 function g1LoadEquation() {
   const eq = G1_EQUATIONS[g1Step];
+  g1ShuffleGlyphs();
+  g1BuildLegend();
   document.getElementById('g1-equation').innerHTML =
     `${renderParts(eq.aParts)} <span class="eq-op">${eq.op}</span> ${renderParts(eq.bParts)}`;
   document.getElementById('g1-round-lbl').textContent = `Équation ${g1Step+1} / 3`;
