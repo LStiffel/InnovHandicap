@@ -1,6 +1,6 @@
 // ---------- Mini-jeu TDAH — "L'attention capturée" ----------
-// Architecture calquée sur dyslexie.js : même cycle de vie procédural,
-// mêmes conventions de nommage, mêmes classes CSS réutilisées.
+// Architecture calquée sur le jeu dyslexie (dyslexie.html) : même cycle de vie
+// procédural, mêmes conventions de nommage, mêmes classes CSS réutilisées.
 
 // ---------- Configuration ----------
 const GAME_DURATION = 30;            // secondes
