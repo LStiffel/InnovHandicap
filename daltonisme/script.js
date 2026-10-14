@@ -5,7 +5,6 @@ const etatJeu = {
   scoreN1:  false,
   scoreN1b: false,
   scoreN3:  false,
-  quizReussi: false,
   /* Minuteries */
   intervalN1:  null,
   intervalN1b: null,
@@ -264,52 +263,6 @@ function finNiveau3(victoire, raison = '', filCouleur = '') {
 }
 
 /* ================================================================
-   QUIZ QCM
-================================================================ */
-function afficherQuiz() {
-  afficherEcran('ecran-quiz');
-}
-
-function repondreQuiz(bouton, estCorrect) {
-  /* Désactiver tous les boutons */
-  document.querySelectorAll('.quiz-option').forEach(btn => {
-    btn.disabled = true;
-  });
-
-  /* Surligner la réponse choisie */
-  bouton.classList.add(estCorrect ? 'bonne-reponse' : 'mauvaise-reponse');
-
-  /* Surligner la bonne réponse si l'utilisateur s'est trompé */
-  if (!estCorrect) {
-    document.querySelectorAll('.quiz-option').forEach(btn => {
-      if (btn.onclick.toString().includes('true')) {
-        btn.classList.add('bonne-reponse');
-      }
-    });
-  }
-
-  etatJeu.quizReussi = estCorrect;
-
-  /* Afficher le feedback */
-  const feedback = document.getElementById('quiz-feedback');
-  feedback.classList.add('visible');
-  feedback.innerHTML = estCorrect
-    ? `<strong style="color:var(--moss);">✅ Bonne réponse !</strong><br>
-       Vous avez simulé le <strong>daltonisme</strong> — une déficience de la perception des couleurs.
-       Niveau 1 : <strong>deutéranopie</strong> (rouge ≈ vert). Niveau 2 : <strong>protanopie</strong>
-       (rouge quasi invisible, orange ≈ vert). Niveau 3 : les deux en même temps.
-       Environ <strong>8% des hommes</strong> vivent cela chaque jour, sans filtre, sans chrono.`
-    : `<strong style="color:var(--coral);">❌ Pas tout à fait…</strong><br>
-       Ce jeu simule le <strong>daltonisme</strong> — une déficience de la perception des couleurs,
-       et non un trouble de l'attention (TDA), de l'écriture (dysgraphie) ou du comportement
-       alimentaire (TCA). Les couleurs que vous voyiez étaient filtrées pour reproduire
-       ce que perçoivent des millions de personnes chaque jour.`;
-
-  /* Afficher le bouton suivant */
-  document.getElementById('btn-quiz-suite').style.display = 'inline-flex';
-}
-
-/* ================================================================
    RÉCAPITULATIF FINAL
 ================================================================ */
 function afficherRecapitulatif() {
@@ -358,18 +311,6 @@ function rejouer() {
   etatJeu.scoreN1  = false;
   etatJeu.scoreN1b = false;
   etatJeu.scoreN3  = false;
-  etatJeu.quizReussi = false;
-
-  /* Réinitialiser le quiz */
-  document.querySelectorAll('.quiz-option').forEach(btn => {
-    btn.disabled = false;
-    btn.classList.remove('bonne-reponse', 'mauvaise-reponse');
-  });
-  const feedback = document.getElementById('quiz-feedback');
-  if (feedback) { feedback.classList.remove('visible'); feedback.innerHTML = ''; }
-  const btnSuite = document.getElementById('btn-quiz-suite');
-  if (btnSuite) btnSuite.style.display = 'none';
-
   afficherEcran('ecran-accueil');
 }
 

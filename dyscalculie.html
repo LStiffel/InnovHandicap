@@ -168,25 +168,29 @@
     <div class="result-title" id="g2-result-title">Résultat</div>
     <div class="result-sub" id="g2-result-sub"></div>
     <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
-      <button class="btn-primary" onclick="goQCM()">Et maintenant… devinez ! →</button>
+      <button class="btn-primary" onclick="goBilan()">Voir le bilan →</button>
       <button class="btn-ghost" onclick="g2Restart()">Rejouer</button>
     </div>
   </div>
 </div>
 
-<!-- QCM -->
-<div id="screen-qcm" class="screen">
+<!-- BILAN -->
+<div id="screen-bilan" class="screen">
   <div class="panel fade-in" style="width:100%;display:flex;flex-direction:column;gap:20px;">
     <div class="game-header">
       <button class="back-btn" onclick="goHome()">← Accueil</button>
-      <span class="game-title-bar">🧠 À vous de diagnostiquer</span>
+      <span class="game-title-bar">🧠 Ce que vous avez vécu</span>
     </div>
-    <p style="color:var(--muted);line-height:1.65;font-size:0.93rem;">
-      Vous venez de vivre deux expériences : des chiffres impossibles à lire automatiquement, et des quantités impossibles à percevoir d'un coup d'œil.<br><br>
-      <strong style="color:var(--text);">Quel trouble des apprentissages ces deux jeux cherchaient-ils à simuler ?</strong>
-    </p>
-    <div id="qcm-options" style="display:flex;flex-direction:column;gap:10px;"></div>
-    <div id="qcm-feedback" class="hidden" style="margin-top:4px;"></div>
+    <div class="bilan-box">
+      <p>La <strong>dyscalculie</strong> est un trouble neurodéveloppemental spécifique qui affecte la capacité à traiter et manipuler les nombres. Elle touche :</p>
+      <p>— L'<strong>automatisation des symboles numériques</strong> (jeu 1) : les chiffres arabes ne deviennent jamais "évidents", chaque lecture coûte un effort cognitif.</p>
+      <p>— Le <strong>subitizing</strong> (jeu 2) : la perception instantanée des petites quantités est absente ou très déficiente, forçant un comptage un par un même pour 3 objets.</p>
+      <p style="margin-top:8px;">Ce n'est <em>pas</em> un manque de travail ou d'intelligence. C'est un fonctionnement neurologique différent, permanent, qui demande des adaptations pédagogiques spécifiques.</p>
+      <div style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap;">
+        <button class="btn-primary" onclick="goHome()">← Accueil</button>
+        <button class="btn-ghost" onclick="g2Restart()">Rejouer le jeu 2</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -519,107 +523,8 @@ function g2Cleanup(){
   g2RoundActive=false;
 }
 
-// ── QCM ─────────────────────────────────────────
-const QCM_OPTIONS = [
-  {
-    letter: 'A',
-    label: 'La dyslexie',
-    sub: 'Trouble de la lecture et du décodage des mots écrits',
-    correct: false,
-    explain: 'La dyslexie affecte principalement la lecture et le décodage des mots écrits. Elle ne cible pas spécifiquement les chiffres ni la perception des quantités.'
-  },
-  {
-    letter: 'B',
-    label: 'La dyscalculie',
-    sub: 'Trouble de l\'acquisition et de la manipulation des nombres',
-    correct: true,
-    explain: null
-  },
-  {
-    letter: 'C',
-    label: 'La dyspraxie',
-    sub: 'Trouble de la coordination et de la planification des gestes',
-    correct: false,
-    explain: 'La dyspraxie (ou trouble développemental de la coordination) affecte la motricité et la planification des gestes. Elle n\'est pas liée à la lecture des symboles numériques ni à la perception des quantités.'
-  },
-  {
-    letter: 'D',
-    label: 'La dysorthographie',
-    sub: 'Trouble persistant de l\'acquisition de l\'orthographe',
-    correct: false,
-    explain: 'La dysorthographie concerne la production écrite et l\'orthographe. Elle est souvent associée à la dyslexie, mais n\'implique pas les difficultés avec les nombres et les quantités.'
-  },
-  {
-    letter: 'E',
-    label: 'La dysphasie',
-    sub: 'Trouble structurel du langage oral',
-    correct: false,
-    explain: 'La dysphasie est un trouble du développement du langage oral. Elle touche la compréhension et la production de la parole, pas le traitement des chiffres ou des quantités.'
-  },
-];
-
-function goQCM() {
-  showScreen('screen-qcm');
-  const container = document.getElementById('qcm-options');
-  container.innerHTML = '';
-  document.getElementById('qcm-feedback').classList.add('hidden');
-
-  // Shuffle options
-  const shuffled = [...QCM_OPTIONS].sort(() => Math.random() - 0.5);
-
-  shuffled.forEach((opt, i) => {
-    const btn = document.createElement('button');
-    btn.className = 'qcm-option';
-    btn.innerHTML = `
-      <div class="qcm-letter">${String.fromCharCode(65+i)}</div>
-      <div class="qcm-text">
-        <div>${opt.label}</div>
-        <div class="qcm-sub">${opt.sub}</div>
-      </div>`;
-    btn.addEventListener('click', () => qcmAnswer(opt, btn, shuffled));
-    container.appendChild(btn);
-  });
-}
-
-function qcmAnswer(opt, clickedBtn, shuffled) {
-  // Disable all buttons
-  document.querySelectorAll('.qcm-option').forEach(b => b.disabled = true);
-
-  const fb = document.getElementById('qcm-feedback');
-  fb.classList.remove('hidden');
-
-  if(opt.correct) {
-    clickedBtn.classList.add('correct');
-    fb.innerHTML = `
-      <div class="qcm-reveal">
-        <h3>✓ Bonne réponse — c'est la dyscalculie !</h3>
-        <p>La <strong>dyscalculie</strong> est un trouble neurodéveloppemental spécifique qui affecte la capacité à traiter et manipuler les nombres. Elle touche :</p>
-        <p>— L'<strong>automatisation des symboles numériques</strong> (jeu 1) : les chiffres arabes ne deviennent jamais "évidents", chaque lecture coûte un effort cognitif.</p>
-        <p>— Le <strong>subitizing</strong> (jeu 2) : la perception instantanée des petites quantités est absente ou très déficiente, forçant un comptage un par un même pour 3 objets.</p>
-        <p style="margin-top:8px;">Ce n'est <em>pas</em> un manque de travail ou d'intelligence. C'est un fonctionnement neurologique différent, permanent, qui demande des adaptations pédagogiques spécifiques.</p>
-        <div style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap;">
-          <button class="btn-primary" onclick="goHome()">← Accueil</button>
-          <button class="btn-ghost" onclick="g2Restart()">Rejouer le jeu 2</button>
-        </div>
-      </div>`;
-  } else {
-    clickedBtn.classList.add('wrong');
-    // Highlight correct answer
-    document.querySelectorAll('.qcm-option').forEach((b, i) => {
-      if(shuffled[i].correct) b.classList.add('correct');
-    });
-    fb.innerHTML = `
-      <div class="qcm-reveal wrong-reveal">
-        <h3>✗ Pas tout à fait…</h3>
-        <p>${opt.explain}</p>
-        <p>La bonne réponse est la <strong style="color:var(--teal);">dyscalculie</strong> — un trouble spécifique du traitement des nombres qui rend difficiles à la fois la lecture automatique des symboles numériques et la perception instantanée des quantités (le <em>subitizing</em>).</p>
-        <div style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap;">
-          <button class="btn-primary" onclick="goHome()">← Accueil</button>
-          <button class="btn-ghost" onclick="goQCM()">Réessayer le QCM</button>
-        </div>
-      </div>`;
-  }
-}
+// ── BILAN ───────────────────────────────────────
+function goBilan() { showScreen('screen-bilan'); }
 </script>
 </body>
 </html>

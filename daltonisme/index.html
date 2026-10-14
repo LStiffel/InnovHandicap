@@ -210,44 +210,7 @@
       <h2 id="titre-resultat-n3"></h2>
       <p id="sous-titre-n3" style="color:var(--ink-soft);margin-top:4px;font-size:0.9rem;"></p>
     </div>
-    <button class="btn btn-primaire" onclick="afficherQuiz()">
-      Et maintenant… le quiz →
-    </button>
-  </div>
-
-
-  <!-- ============================================================
-       ÉCRAN QUIZ — QCM (révélation du trouble ICI seulement)
-  ============================================================ -->
-  <div id="ecran-quiz" class="ecran">
-    <div class="carte" style="text-align:center;">
-      <h2>🧠 À vous de juger</h2>
-      <p style="color:var(--ink-soft);font-size:0.9rem;margin-top:4px;">
-        Vous venez de traverser 3 niveaux avec une perception altérée.
-        Avez-vous compris de quoi il s'agissait ?
-      </p>
-    </div>
-
-    <div class="quiz-carte">
-      <p class="quiz-question">Quel trouble avez-vous simulé pendant ce jeu ?</p>
-      <div class="quiz-options">
-        <button class="quiz-option" onclick="repondreQuiz(this, false)">
-          🧠 TDA — Trouble du Déficit de l'Attention
-        </button>
-        <button class="quiz-option" onclick="repondreQuiz(this, false)">
-          ✏️ Dysgraphie — Trouble de l'écriture manuscrite
-        </button>
-        <button class="quiz-option" onclick="repondreQuiz(this, true)">
-          🎨 Daltonisme — Déficience de la perception des couleurs
-        </button>
-        <button class="quiz-option" onclick="repondreQuiz(this, false)">
-          🍽️ TCA — Trouble du Comportement Alimentaire
-        </button>
-      </div>
-      <div id="quiz-feedback" class="quiz-feedback"></div>
-    </div>
-
-    <button id="btn-quiz-suite" class="btn btn-primaire" style="display:none;" onclick="afficherRecapitulatif()">
+    <button class="btn btn-primaire" onclick="afficherRecapitulatif()">
       Voir le bilan complet →
     </button>
   </div>
