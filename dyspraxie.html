@@ -4,220 +4,181 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dans la Peau d'un Dyspraxique</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
   <style>
 
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
     :root {
-      --bg:           #eef2f7;
-      --surface:      #ffffff;
-      --primary:      #4a6fa5;
-      --primary-dk:   #335a8a;
-      --primary-lt:   #dce8f8;
-      --accent:       #e07b54;
-      --accent-dk:    #c5623c;
-      --success:      #4caf7d;
-      --success-dk:   #389160;
-      --danger:       #e05c5c;
-      --text:         #2c3e50;
-      --text-light:   #637082;
-      --border:       #cdd8e8;
-      --shadow-sm:    0 2px 8px  rgba(0,0,0,.08);
-      --shadow-md:    0 4px 20px rgba(0,0,0,.12);
-      --shadow-lg:    0 8px 32px rgba(0,0,0,.16);
-      --radius-sm:    8px;
-      --radius-md:    14px;
-      --radius-lg:    22px;
-      --font:         'Segoe UI', system-ui, -apple-system, sans-serif;
-      --transition:   .2s ease;
+      --paper:      #FBF6EC;
+      --paper-line: #E7DEC9;
+      --ink:        #2B2A3D;
+      --ink-soft:   #6B6880;
+      --coral:      #E2664B;
+      --moss:       #5E8C6A;
+      --gold:       #D9A23B;
+      --lilac:      #8C7FB8;
+      --correct-bg: #DCEBDD;
+      --wrong-bg:   #F6D6CE;
+      --radius:     14px;
     }
 
-    html { scroll-behavior: smooth; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: var(--font);
-      background: var(--bg);
-      color: var(--text);
+      background: var(--paper);
+      background-image: linear-gradient(var(--paper-line) 1px, transparent 1px);
+      background-size: 100% 2.4em;
+      color: var(--ink);
+      font-family: 'Times New Roman', serif;
       min-height: 100vh;
+      padding: 32px 16px 60px;
     }
 
     /* ================================================
        SYSTÈME D'ÉCRANS
     ================================================ */
-    .screen {
-      display: none;
-      min-height: 100vh;
-    }
+    .screen { display: none; }
     .screen.active { display: block; }
 
-    /* ================================================
-       BOUTONS GLOBAUX
-    ================================================ */
-    .btn {
+    .sheet {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 22px;
+    }
+
+    .brand {
       display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 14px 32px;
-      border: none;
-      border-radius: 50px;
-      font-size: 1rem;
+      align-items: baseline;
+      gap: .15em;
+      font-family: 'Caveat', cursive;
+      font-size: 3rem;
       font-weight: 700;
+      line-height: 1;
+    }
+    .brand .b { color: var(--coral); display: inline-block; transform: scaleX(-1); }
+    .brand .b.flip-d { color: var(--lilac); transform: scaleX(1); }
+
+    .subtitle {
+      color: var(--ink-soft);
+      font-size: 1rem;
+      margin-top: 2px;
+    }
+
+    .card {
+      background: #fff;
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      box-shadow: 6px 6px 0 var(--ink);
+      padding: 28px 26px;
+      margin-bottom: 22px;
+    }
+
+    .card h2 {
+      margin: 0 0 14px;
+      font-family: 'Caveat', cursive;
+      font-size: 1.6rem;
+      color: var(--ink-soft);
+    }
+
+    .row {
+      display: flex;
+      gap: 12px;
+      margin-top: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    /* ================================================
+       BOUTONS
+    ================================================ */
+    .action {
+      display: inline-block;
+      border: 2px solid var(--ink);
+      background: var(--gold);
+      color: var(--ink);
+      font-weight: 700;
+      font-family: 'Atkinson Hyperlegible', sans-serif;
+      font-size: 1rem;
+      padding: 10px 18px;
+      border-radius: 10px;
       cursor: pointer;
-      transition: transform var(--transition), box-shadow var(--transition), background var(--transition);
       text-decoration: none;
+      box-shadow: 3px 3px 0 var(--ink);
+      transition: transform .1s ease, box-shadow .1s ease;
     }
-    .btn:hover  { transform: translateY(-2px); box-shadow: var(--shadow-md); }
-    .btn:active { transform: translateY(0); }
-
-    .btn-primary {
-      background: var(--primary);
-      color: #fff;
-      box-shadow: 0 4px 16px rgba(74,111,165,.35);
-    }
-    .btn-primary:hover { background: var(--primary-dk); }
-
-    .btn-accent {
-      background: var(--accent);
-      color: #fff;
-      box-shadow: 0 4px 16px rgba(224,123,84,.35);
-    }
-    .btn-accent:hover { background: var(--accent-dk); }
+    .action:hover { transform: translate(1px, 1px); box-shadow: 2px 2px 0 var(--ink); }
+    .action.ghost { background: #fff; }
 
     /* ================================================
        ÉCRAN 1 — ACCUEIL
     ================================================ */
-    #screen-accueil.active {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .accueil-inner {
-      max-width: 620px;
-      width: 100%;
-      text-align: center;
-      padding: 40px 24px;
-    }
-
-    .accueil-hero-icon {
-      font-size: 5rem;
-      display: block;
-      margin-bottom: 20px;
-      animation: float 3s ease-in-out infinite;
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50%       { transform: translateY(-10px); }
-    }
-
-    .accueil-inner h1 {
-      font-size: clamp(2rem, 5vw, 3rem);
-      font-weight: 900;
-      line-height: 1.2;
-      margin-bottom: 16px;
-      color: var(--text);
-    }
-
-    .accueil-inner h1 span {
-      color: var(--primary);
-      position: relative;
-    }
-
-    .tagline {
+    .intro-text {
       font-size: 1.05rem;
-      color: var(--text-light);
       line-height: 1.7;
-      margin-bottom: 28px;
     }
 
-    .accueil-warning {
-      background: #fff8e1;
-      border: 2px solid #ffe082;
-      border-radius: var(--radius-md);
-      padding: 16px 20px;
-      margin-bottom: 32px;
-      font-size: .92rem;
-      color: #7a5f00;
+    .warning {
+      margin-top: 18px;
+      padding: 14px 16px;
+      background: var(--paper);
+      border: 2px dashed var(--gold);
+      border-radius: 10px;
+      font-size: .95rem;
       line-height: 1.6;
-      text-align: left;
     }
 
     /* ================================================
        ÉCRAN 2 — JEU
     ================================================ */
     #screen-jeu.active {
-      display: flex;
-      flex-direction: column;
-      cursor: none; /* cache le vrai curseur */
+      cursor: none;       /* cache le vrai curseur */
+      user-select: none;  /* empêche la sélection de texte pendant le jeu */
     }
+
+    #screen-jeu .sheet { max-width: 1100px; }
 
     .jeu-hud {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 14px 28px;
-      background: var(--surface);
-      box-shadow: var(--shadow-sm);
-      flex-shrink: 0;
-      position: relative;
-      z-index: 10;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding: 14px 22px;
     }
 
-    .chrono-pill {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--primary-lt);
-      border-radius: 50px;
-      padding: 8px 18px;
+    .timerline {
+      font-family: 'Caveat', cursive;
+      font-size: 1.6rem;
       font-weight: 700;
-      font-size: 1.1rem;
-      color: var(--primary-dk);
+      color: var(--ink);
     }
 
     .hud-tip {
-      font-size: .9rem;
-      color: var(--text-light);
-      font-weight: 600;
+      font-size: 1rem;
+      color: var(--ink-soft);
     }
 
     .jeu-layout {
       display: grid;
-      grid-template-columns: 220px 1fr 240px;
-      gap: 20px;
-      padding: 20px 28px;
-      flex: 1;
-      min-height: 0;
+      grid-template-columns: 200px 1fr 230px;
+      gap: 22px;
     }
 
-    /* --- Panel tâches --- */
-    .task-panel {
-      background: var(--surface);
-      border-radius: var(--radius-md);
-      box-shadow: var(--shadow-sm);
-      padding: 20px;
+    .jeu-layout .card {
+      margin-bottom: 0;
+      padding: 18px;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 12px;
     }
 
-    .task-panel h3,
-    .books-zone h3,
-    .bag-panel h3 {
-      font-size: .85rem;
-      text-transform: uppercase;
-      letter-spacing: .1em;
-      color: var(--text-light);
-      font-weight: 700;
-      margin-bottom: 4px;
-    }
+    .jeu-layout .card h2 { margin: 0; }
 
+    /* --- Panel tâches --- */
     #task-list {
       display: flex;
       flex-direction: column;
@@ -228,52 +189,42 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 10px 12px;
-      background: var(--bg);
-      border-radius: var(--radius-sm);
-      font-weight: 600;
+      padding: 8px 12px;
+      background: var(--paper);
+      border: 2px solid var(--ink);
+      border-radius: 10px;
+      font-family: 'Atkinson Hyperlegible', sans-serif;
+      font-weight: 700;
       font-size: .9rem;
-      transition: background var(--transition);
+      transition: background .2s ease;
     }
 
     .task-check {
       width: 22px; height: 22px;
       border-radius: 50%;
-      border: 2.5px solid var(--border);
+      border: 2px solid var(--ink-soft);
       display: flex; align-items: center; justify-content: center;
       font-size: .75rem;
       color: transparent;
       flex-shrink: 0;
-      transition: all var(--transition);
+      transition: all .2s ease;
     }
 
-    .task-item.done {
-      background: #f0fdf4;
-      color: var(--success-dk);
-    }
+    .task-item.done { background: var(--correct-bg); }
 
     .task-item.done .task-check {
-      background: var(--success);
-      border-color: var(--success);
+      background: var(--moss);
+      border-color: var(--moss);
       color: #fff;
     }
 
     /* --- Zone livres --- */
-    .books-zone {
-      background: var(--surface);
-      border-radius: var(--radius-md);
-      box-shadow: var(--shadow-sm);
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      overflow: hidden;
-    }
+    .books-zone { overflow: hidden; }
 
     #books-container {
       position: relative;
       flex: 1;
-      min-height: 300px;
+      min-height: 340px;
     }
 
     /* --- Livre individuel --- */
@@ -281,32 +232,25 @@
       position: absolute;
       width: 72px;
       height: 95px;
+      border: 2px solid var(--ink);
+      border-left: 9px solid var(--ink);
       border-radius: 5px 10px 10px 5px;
-      border-left: 9px solid rgba(0,0,0,.18);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       gap: 4px;
       user-select: none;
-      box-shadow: 3px 4px 12px rgba(0,0,0,.2);
+      box-shadow: 3px 3px 0 var(--ink);
+      font-family: 'Atkinson Hyperlegible', sans-serif;
       font-size: .6rem;
-      font-weight: 800;
-      color: rgba(255,255,255,.95);
+      font-weight: 700;
+      color: #fff;
       text-align: center;
       padding: 6px 4px;
       line-height: 1.3;
       will-change: left, top;
       touch-action: none;
-    }
-
-    .book::after {
-      content: '';
-      position: absolute;
-      top: 8px; bottom: 8px; right: 7px;
-      width: 3px;
-      background: rgba(255,255,255,.22);
-      border-radius: 2px;
     }
 
     .book .book-emoji { font-size: 1.45rem; line-height: 1; }
@@ -319,29 +263,20 @@
     }
 
     /* --- Cartable (droite) --- */
-    .bag-panel {
-      background: var(--surface);
-      border-radius: var(--radius-md);
-      box-shadow: var(--shadow-sm);
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
     #bag-dropzone {
       flex: 1;
-      border: 3px dashed var(--border);
-      border-radius: var(--radius-md);
+      border: 2px dashed var(--ink-soft);
+      border-radius: 10px;
+      background: var(--paper);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       gap: 10px;
-      color: var(--text-light);
-      font-size: .85rem;
-      font-weight: 600;
-      transition: border-color var(--transition), background var(--transition), transform .1s;
+      color: var(--ink-soft);
+      font-family: 'Caveat', cursive;
+      font-size: 1.3rem;
+      transition: border-color .2s ease, background .2s ease, transform .1s;
       min-height: 260px;
       padding: 12px;
     }
@@ -349,8 +284,9 @@
     .bag-icon { font-size: 2.5rem; }
 
     #bag-dropzone.over {
-      border-color: var(--success);
-      background: #f0fdf4;
+      border-color: var(--moss);
+      border-style: solid;
+      background: var(--correct-bg);
       transform: scale(1.02);
     }
 
@@ -365,12 +301,13 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 8px 12px;
-      border-radius: var(--radius-sm);
+      padding: 6px 12px;
+      border: 2px solid var(--ink);
+      border-radius: 999px;
       color: #fff;
+      font-family: 'Atkinson Hyperlegible', sans-serif;
       font-size: .82rem;
       font-weight: 700;
-      box-shadow: var(--shadow-sm);
     }
 
     /* ================================================
@@ -381,9 +318,9 @@
       top: 0; left: 0;
       width: 32px; height: 32px;
       margin-left: -16px; margin-top: -16px;
-      border: 3px solid var(--accent);
+      border: 3px solid var(--coral);
       border-radius: 50%;
-      background: rgba(224, 123, 84, .2);
+      background: rgba(226, 102, 75, .2);
       pointer-events: none;
       z-index: 99999;
       transition: background .15s, border-color .15s;
@@ -395,13 +332,13 @@
       top: 50%; left: 50%;
       width: 5px; height: 5px;
       margin: -2.5px 0 0 -2.5px;
-      background: var(--accent-dk);
+      background: var(--ink);
       border-radius: 50%;
     }
 
     #virtual-cursor.grabbing {
-      border-color: var(--success);
-      background: rgba(76, 175, 125, .25);
+      border-color: var(--moss);
+      background: rgba(94, 140, 106, .25);
       width: 38px; height: 38px;
       margin-left: -19px; margin-top: -19px;
     }
@@ -409,208 +346,73 @@
     #virtual-cursor.hidden { display: none; }
 
     /* ================================================
-       ÉCRAN 3 — DEVINE LE TROUBLE
+       ÉCRAN 3 — SCORE
     ================================================ */
-    #screen-devine {
-      background: linear-gradient(135deg, #f0fdf4 0%, #eff6ff 100%);
-      padding: 40px 20px;
-    }
-    #screen-devine.active {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .devine-card {
-      max-width: 660px;
-      width: 100%;
-      text-align: center;
-    }
-
-    .devine-card h2 {
-      font-size: clamp(1.4rem, 3vw, 2rem);
-      font-weight: 800;
-      color: var(--primary);
-      margin-bottom: 8px;
-    }
-
-    .devine-sub {
-      color: var(--text-light);
-      font-size: .95rem;
-      margin-bottom: 28px;
-    }
-
-    .troubles-grid {
+    .stats {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      gap: 12px;
-      margin-bottom: 28px;
-    }
-
-    .trouble-btn {
-      background: var(--surface);
-      border: 2px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 18px 10px;
-      cursor: pointer;
-      font-size: .9rem;
-      font-weight: 700;
-      color: var(--text);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      transition: border-color var(--transition), background var(--transition), transform var(--transition);
-    }
-    .trouble-btn .t-emoji { font-size: 1.8rem; }
-    .trouble-btn:hover    { border-color: var(--primary); background: var(--primary-lt); transform: translateY(-2px); }
-    .trouble-btn.selected { border-color: var(--primary); background: var(--primary-lt); }
-    .trouble-btn.correct  { border-color: var(--success); background: #f0fdf4; color: var(--success-dk); }
-    .trouble-btn.wrong    { border-color: var(--danger);  background: #fef2f2; color: var(--danger); }
-
-    #btn-valider-trouble { display: none; margin: 0 auto; }
-
-    /* ================================================
-       ÉCRAN 4 — SCORE
-    ================================================ */
-    #screen-score {
-      background: linear-gradient(135deg, #eff6ff 0%, #f5f0ff 100%);
-      padding: 40px 20px;
-      overflow-y: auto;
-    }
-    #screen-score.active { display: block; }
-
-    .score-card {
-      max-width: 700px;
-      margin: 0 auto;
-    }
-
-    .score-header {
-      text-align: center;
-      margin-bottom: 32px;
-    }
-
-    .score-trophy { font-size: 4rem; display: block; margin-bottom: 12px; }
-
-    .score-header h2 {
-      font-size: clamp(1.5rem, 3vw, 2.2rem);
-      font-weight: 900;
-      color: var(--primary);
-      margin-bottom: 8px;
-    }
-
-    .score-header p { color: var(--text-light); font-size: .95rem; }
-
-    .score-big {
-      background: var(--surface);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-md);
-      padding: 28px;
-      text-align: center;
-      margin-bottom: 24px;
-    }
-
-    .score-label {
-      font-size: .85rem;
-      text-transform: uppercase;
-      letter-spacing: .1em;
-      color: var(--text-light);
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    .score-number {
-      font-size: clamp(3rem, 8vw, 5rem);
-      font-weight: 900;
-      color: var(--primary);
-      line-height: 1;
-    }
-
-    .score-details {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(2, 1fr);
       gap: 14px;
-      margin-bottom: 24px;
+      text-align: center;
+    }
+    .stat .num {
+      font-size: 2.6rem;
+      font-family: 'Caveat', cursive;
+      font-weight: 700;
+      color: var(--moss);
+    }
+    .stat .label {
+      font-size: .8rem;
+      color: var(--ink-soft);
+      text-transform: uppercase;
+      letter-spacing: .05em;
     }
 
-    .score-detail-item {
-      background: var(--surface);
-      border-radius: var(--radius-md);
-      box-shadow: var(--shadow-sm);
-      padding: 18px;
+    .feedback {
+      margin-top: 14px;
+      font-size: .95rem;
+      color: var(--ink-soft);
       text-align: center;
     }
 
-    .score-detail-item .sd-label {
+    footer {
+      text-align: center;
+      color: var(--ink-soft);
+      font-size: .85rem;
+      margin-top: 22px;
+    }
+
+    kbd {
+      background: #fff;
+      border: 1px solid var(--ink-soft);
+      border-radius: 4px;
+      padding: 1px 5px;
       font-size: .8rem;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      color: var(--text-light);
-      font-weight: 700;
-      margin-bottom: 6px;
+      font-family: 'Atkinson Hyperlegible', sans-serif;
     }
 
-    .score-detail-item .sd-value {
-      font-size: 1.5rem;
-      font-weight: 900;
-      color: var(--text);
-    }
-
-    .result-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      margin-top: 8px;
-      padding: 4px 14px;
-      border-radius: 50px;
-      font-size: .8rem;
-      font-weight: 700;
-    }
-    .result-badge.correct { background: #f0fdf4; color: var(--success-dk); }
-    .result-badge.wrong   { background: #fef2f2; color: var(--danger); }
-
-    .explication-box {
-      background: var(--surface);
-      border-radius: var(--radius-md);
-      box-shadow: var(--shadow-sm);
-      padding: 24px;
-      margin-bottom: 24px;
-    }
-
-    .explication-box h3 {
-      font-size: 1.1rem;
-      font-weight: 800;
-      color: var(--primary);
-      margin-bottom: 14px;
-    }
-
-    .explication-box p {
-      font-size: .92rem;
-      color: var(--text);
-      line-height: 1.75;
+    .explication-texte {
+      font-size: 1rem;
+      line-height: 1.7;
       white-space: pre-line;
-      margin-bottom: 10px;
     }
 
     .explication-source {
-      font-size: .8rem !important;
-      color: var(--text-light) !important;
+      margin-top: 12px;
+      font-size: .85rem;
+      color: var(--ink-soft);
       font-style: italic;
-    }
-
-    .score-actions {
-      text-align: center;
-      padding-bottom: 40px;
     }
 
     /* ================================================
        RESPONSIVE
     ================================================ */
-    @media (max-width: 700px) {
+    @media (max-width: 800px) {
       .jeu-layout { grid-template-columns: 1fr; }
-      #books-container { height: 340px; }
-      .score-details { grid-template-columns: 1fr; }
+      #bag-dropzone { min-height: 160px; }
+    }
+
+    @media (max-width: 480px) {
+      .brand { font-size: 2.2rem; }
     }
 
   </style>
@@ -625,22 +427,31 @@
        ÉCRAN 1 — ACCUEIL
   ==================================================== -->
   <section id="screen-accueil" class="screen active">
-    <div class="accueil-inner">
-      <span class="accueil-hero-icon">🎒</span>
-      <h1>Dans la peau<br>d'un <span>Dyspraxique</span></h1>
-      <p class="tagline">
-        Prépare ton cartable… mais ton corps refuse de t'obéir.<br>
-        Vis quelques instants dans le quotidien de ceux dont
-        les gestes ne répondent jamais comme prévu.
-      </p>
-      <div class="accueil-warning">
-        ⚠️ <strong>Attention :</strong> Le curseur va se comporter de façon
-        volontairement étrange — c'est entièrement voulu et fait partie de
-        l'expérience ! Ne cherche pas à réparer ton ordinateur. 😄
+    <div class="sheet">
+      <header>
+        <div class="brand">
+          Inov'<span class="b">H</span>an<span class="b flip-d">d</span>icap
+        </div>
+        <div class="subtitle">Dans la peau d'un dyspraxique</div>
+      </header>
+
+      <div class="card">
+        <h2>🎒 Règle du jeu</h2>
+        <p class="intro-text">
+          Prépare ton cartable… mais ton corps refuse de t'obéir.<br>
+          Glisse les <strong>3 livres demandés</strong> dans le cartable le plus vite possible.
+          Vis quelques instants dans le quotidien de ceux dont
+          les gestes ne répondent jamais comme prévu.
+        </p>
+        <div class="warning">
+          ⚠️ <strong>Attention :</strong> le curseur va se comporter de façon
+          volontairement étrange — c'est entièrement voulu et fait partie de
+          l'expérience ! Ne cherche pas à réparer ton ordinateur. 😄
+        </div>
+        <div class="row">
+          <button class="action" onclick="goTo('jeu')">Commencer ▶</button>
+        </div>
       </div>
-      <button class="btn btn-primary" onclick="goTo('jeu')">
-        ▶&nbsp; Commencer l'expérience
-      </button>
     </div>
   </section>
 
@@ -648,96 +459,77 @@
        ÉCRAN 2 — JEU
   ==================================================== -->
   <section id="screen-jeu" class="screen">
+    <div class="sheet">
 
-    <div class="jeu-hud">
-      <div class="chrono-pill">
-        <span class="chrono-icon">⏱️</span>
-        <span id="chrono-display">00:00</span>
-      </div>
-      <div class="hud-tip">
-        📋 Glisse les 3 bons livres dans le cartable →
-      </div>
-    </div>
-
-    <div class="jeu-layout">
-
-      <div class="task-panel">
-        <h3>📋 À ranger</h3>
-        <div id="task-list"></div>
-      </div>
-
-      <div class="books-zone">
-        <h3>📚 Tes livres</h3>
-        <div id="books-container"></div>
-      </div>
-
-      <div class="bag-panel">
-        <h3>🎒 Cartable</h3>
-        <div id="bag-dropzone">
-          <span class="bag-icon">🎒</span>
-          <div id="bag-contents"></div>
-          <span>Dépose ici</span>
+      <header>
+        <div class="brand">
+          Inov'<span class="b">H</span>an<span class="b flip-d">d</span>icap
         </div>
+        <div class="subtitle">Dans la peau d'un dyspraxique</div>
+      </header>
+
+      <div class="card jeu-hud">
+        <span class="timerline">⏱ <span id="chrono-display">00:00</span></span>
+        <span class="hud-tip">📋 Glisse les 3 bons livres dans le cartable →</span>
       </div>
 
+      <div class="jeu-layout">
+
+        <div class="card task-panel">
+          <h2>📋 À ranger</h2>
+          <div id="task-list"></div>
+        </div>
+
+        <div class="card books-zone">
+          <h2>📚 Tes livres</h2>
+          <div id="books-container"></div>
+        </div>
+
+        <div class="card bag-panel">
+          <h2>🎒 Cartable</h2>
+          <div id="bag-dropzone">
+            <span class="bag-icon">🎒</span>
+            <div id="bag-contents"></div>
+            <span>Dépose ici</span>
+          </div>
+        </div>
+
+      </div>
+
+      <footer>Astuce&nbsp;: appuie sur <kbd>Échap</kbd> pour arrêter la partie à tout moment.</footer>
     </div>
   </section>
 
   <!-- ====================================================
-       ÉCRAN 3 — DEVINE LE TROUBLE
-  ==================================================== -->
-  <section id="screen-devine" class="screen">
-    <div class="devine-card">
-      <h2>🤔 Quel trouble as-tu simulé ?</h2>
-      <p class="devine-sub">D'après ton expérience, quel trouble neurologique venais-tu de ressentir ?</p>
-      <div class="troubles-grid" id="troubles-grid"></div>
-      <button class="btn btn-primary" id="btn-valider-trouble" onclick="validerTrouble()">
-        ✅&nbsp; Valider ma réponse
-      </button>
-    </div>
-  </section>
-
-  <!-- ====================================================
-       ÉCRAN 4 — SCORE & EXPLICATION
+       ÉCRAN 3 — SCORE & EXPLICATION
   ==================================================== -->
   <section id="screen-score" class="screen">
-    <div class="score-card">
-
-      <div class="score-header">
-        <span class="score-trophy">🏆</span>
-        <h2>Résultats</h2>
-        <p>Voici comment tu t'en es sorti face à la dyspraxie !</p>
-      </div>
-
-      <div class="score-big">
-        <div class="score-label">Score total</div>
-        <div class="score-number" id="score-final-display">0</div>
-      </div>
-
-      <div class="score-details">
-        <div class="score-detail-item">
-          <div class="sd-label">⏱️ Temps</div>
-          <div class="sd-value" id="score-temps-display">--</div>
+    <div class="sheet">
+      <header>
+        <div class="brand">
+          Inov'<span class="b">H</span>an<span class="b flip-d">d</span>icap
         </div>
-        <div class="score-detail-item">
-          <div class="sd-label">🧠 Identification</div>
-          <div class="sd-value" id="score-identification-display">--</div>
-          <div id="result-badge-container"></div>
+        <div class="subtitle">Dans la peau d'un dyspraxique</div>
+      </header>
+
+      <div class="card">
+        <h2>Résultats de la partie</h2>
+        <div class="stats">
+          <div class="stat"><div class="num" id="score-final-display">0</div><div class="label">score final</div></div>
+          <div class="stat"><div class="num" id="score-temps-display">--</div><div class="label">temps</div></div>
         </div>
+        <p class="feedback" id="score-feedback"></p>
       </div>
 
-      <div class="explication-box">
-        <h3>📖 La Dyspraxie, c'est quoi ?</h3>
-        <p id="explication-texte"></p>
+      <div class="card">
+        <h2>🤲 La dyspraxie, c'est quoi ?</h2>
+        <p class="explication-texte" id="explication-texte"></p>
         <p class="explication-source" id="explication-source-texte"></p>
+        <div class="row">
+          <button class="action ghost" onclick="rejouer()">Rejouer ↻</button>
+          <a href="index.html" class="action">Retour au menu</a>
+        </div>
       </div>
-
-      <div class="score-actions">
-        <button class="btn btn-accent" onclick="rejouer()">
-          🔄&nbsp; Rejouer
-        </button>
-      </div>
-
     </div>
   </section>
 
@@ -750,17 +542,6 @@
   /* ======================================================
      CONFIGURATION
   ====================================================== */
-
-  const TROUBLES = [
-    { nom: "Dyslexie",        emoji: "📖" },
-    { nom: "Dyscalculie",     emoji: "🔢" },
-    { nom: "Dysgraphie",      emoji: "✍️" },
-    { nom: "Dyspraxie",       emoji: "🤲" },
-    { nom: "Dysorthographie", emoji: "🔤" },
-    { nom: "TDA/H",           emoji: "⚡" },
-  ];
-
-  const TROUBLE_CORRECT = "Dyspraxie";
 
   const LIVRES_REQUIS = ["Maths", "Français", "Histoire"];
 
@@ -777,12 +558,10 @@
 
   const SCORE_TEMPS_MAX      = 1000;
   const PENALITE_PAR_SECONDE = 12;
-  const BONUS_IDENTIFICATION = 300;
 
   const EXPLICATION_TROUBLE = `La dyspraxie (officiellement appelée Trouble Développemental de la Coordination – TDC) est un trouble neurologique qui affecte la planification, la coordination et l'exécution des gestes intentionnels.
 
 Contrairement à ce qu'on pourrait croire, elle n'a aucun lien avec l'intelligence. Une personne dyspraxique peut être brillante intellectuellement tout en trouvant épuisant d'écrire, de s'habiller, de ranger ses affaires ou de pratiquer un sport.
-
 
 Avec des aménagements adaptés — temps supplémentaire, outils numériques, bienveillance du corps enseignant — les élèves dyspraxiques peuvent pleinement réussir leur scolarité et s'épanouir.`;
 
@@ -793,8 +572,8 @@ Avec des aménagements adaptés — temps supplémentaire, outils numériques, b
   ====================================================== */
 
   // Force de dérive (plus grand = curseur qui résiste plus)
-  const DRIFT_MAGNITUDE_MIN  = 0.7;
-  const DRIFT_MAGNITUDE_MAX  = 1.5;
+  const DRIFT_MAGNITUDE_MIN  = 0.2;
+  const DRIFT_MAGNITUDE_MAX  = 0.5;
 
   // Fréquence de changement de direction (ms)
   const DRIFT_INTERVALLE_MS  = 1800;
@@ -806,7 +585,7 @@ Avec des aménagements adaptés — temps supplémentaire, outils numériques, b
   const MOUSE_SENSIBILITE    = 1;
 
   // Amplitude du tremblement du curseur (0 = aucun)
-  const TREMBLEMENT_AMPLITUDE = 1.2;
+  const TREMBLEMENT_AMPLITUDE = 0.45;
 
   /* ======================================================
      ÉTAT INTERNE
@@ -815,8 +594,8 @@ Avec des aménagements adaptés — temps supplémentaire, outils numériques, b
   let secondes           = 0;
   let chronoInterval     = null;
   let livresDansCartable = [];
-  let reponseJoueur      = null;
   let tempsFinale        = 0;
+  let partieArretee      = false; // true si le joueur a appuyé sur Échap
 
   /* --- Curseur virtuel --- */
   let vX = window.innerWidth  / 2;   // position actuelle curseur virtuel
@@ -851,7 +630,6 @@ Avec des aménagements adaptés — temps supplémentaire, outils numériques, b
       arreterCurseurVirtuel();
     }
 
-    if (id === 'devine') initDevine();
     if (id === 'score')  initScore();
   }
 
@@ -984,8 +762,8 @@ Avec des aménagements adaptés — temps supplémentaire, outils numériques, b
   function initJeu() {
     livresDansCartable = [];
     secondes           = 0;
-    reponseJoueur      = null;
     tempsFinale        = 0;
+    partieArretee      = false;
     livreEnDrag        = null;
 
     stopChrono();
@@ -1063,12 +841,12 @@ Avec des aménagements adaptés — temps supplémentaire, outils numériques, b
   // on regarde quel livre est SOUS le curseur virtuel
   document.addEventListener('mousedown', (e) => {
     if (!document.getElementById('screen-jeu').classList.contains('active')) return;
+    e.preventDefault(); // pas de sélection de texte, même hors d'un livre
     if (livreEnDrag) return;
 
     const livre = livreSousCurseurVirtuel();
     if (!livre) return;
 
-    e.preventDefault();
     demarrerDrag(livre);
   });
 
@@ -1196,78 +974,49 @@ Avec des aménagements adaptés — temps supplémentaire, outils numériques, b
     tempsFinale = secondes;
     livreEnDrag = null;
 
-    setTimeout(() => goTo('devine'), 700);
+    setTimeout(() => goTo('score'), 700);
   }
 
   /* ======================================================
-     ÉCRAN 3 — DEVINE LE TROUBLE
-  ====================================================== */
-
-  function initDevine() {
-    reponseJoueur = null;
-    const grid = document.getElementById('troubles-grid');
-    grid.innerHTML = '';
-
-    const shuffled = [...TROUBLES].sort(() => Math.random() - .5);
-    shuffled.forEach(t => {
-      const btn = document.createElement('button');
-      btn.className   = 'trouble-btn';
-      btn.dataset.nom = t.nom;
-      btn.innerHTML   = `<span class="t-emoji">${t.emoji}</span>${t.nom}`;
-      btn.addEventListener('click', () => selectionnerTrouble(t.nom, btn));
-      grid.appendChild(btn);
-    });
-
-    document.getElementById('btn-valider-trouble').style.display = 'none';
-  }
-
-  function selectionnerTrouble(nom, btnEl) {
-    document.querySelectorAll('.trouble-btn').forEach(b => b.classList.remove('selected'));
-    btnEl.classList.add('selected');
-    reponseJoueur = nom;
-    document.getElementById('btn-valider-trouble').style.display = 'inline-flex';
-  }
-
-  function validerTrouble() {
-    if (!reponseJoueur) return;
-
-    const correct = reponseJoueur === TROUBLE_CORRECT;
-
-    document.querySelectorAll('.trouble-btn').forEach(btn => {
-      btn.disabled = true;
-      if (btn.dataset.nom === TROUBLE_CORRECT) btn.classList.add('correct');
-      else if (btn.dataset.nom === reponseJoueur && !correct) btn.classList.add('wrong');
-    });
-
-    document.getElementById('btn-valider-trouble').style.display = 'none';
-
-    setTimeout(() => goTo('score'), 1200);
-  }
-
-  /* ======================================================
-     ÉCRAN 4 — SCORE
+     ÉCRAN 3 — SCORE
   ====================================================== */
 
   function initScore() {
-    const scoreTemps = Math.max(0, SCORE_TEMPS_MAX - tempsFinale * PENALITE_PAR_SECONDE);
-    const scoreId    = reponseJoueur === TROUBLE_CORRECT ? BONUS_IDENTIFICATION : 0;
-    const scoreTotal = scoreTemps + scoreId;
-
     const mm = String(Math.floor(tempsFinale / 60)).padStart(2, '0');
     const ss = String(tempsFinale % 60).padStart(2, '0');
     document.getElementById('score-temps-display').textContent          = mm + ':' + ss;
-    document.getElementById('score-identification-display').textContent = scoreId + ' pts';
-
-    const badgeContainer = document.getElementById('result-badge-container');
-    badgeContainer.innerHTML = reponseJoueur === TROUBLE_CORRECT
-      ? `<span class="result-badge correct">✅ Bonne réponse !</span>`
-      : `<span class="result-badge wrong">❌ C'était la Dyspraxie</span>`;
 
     document.getElementById('explication-texte').textContent        = EXPLICATION_TROUBLE;
     document.getElementById('explication-source-texte').textContent = EXPLICATION_SOURCE;
 
+    const feedback = document.getElementById('score-feedback');
+    if (partieArretee) {
+      document.getElementById('score-final-display').textContent = '—';
+      feedback.textContent = "Partie arrêtée. Pas facile de garder le contrôle ? C'est ce que vit une personne dyspraxique pour chaque geste du quotidien.";
+      return;
+    }
+
+    feedback.textContent = "Le curseur t'a résisté ? C'est ce que vit une personne dyspraxique pour chaque geste du quotidien.";
+    const scoreTotal = Math.max(0, SCORE_TEMPS_MAX - tempsFinale * PENALITE_PAR_SECONDE);
     animerCompteur(document.getElementById('score-final-display'), 0, scoreTotal, 1400);
   }
+
+  /* ======================================================
+     ARRÊT AVEC ÉCHAP
+  ====================================================== */
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    if (!document.getElementById('screen-jeu').classList.contains('active')) return;
+    // partie déjà gagnée : on laisse la transition vers le score se faire
+    if (LIVRES_REQUIS.every(n => livresDansCartable.includes(n))) return;
+
+    stopChrono();
+    tempsFinale   = secondes;
+    livreEnDrag   = null;
+    partieArretee = true;
+    goTo('score');
+  });
 
   function animerCompteur(el, startVal, endVal, dureMs) {
     const debut = performance.now();
@@ -1289,7 +1038,6 @@ Avec des aménagements adaptés — temps supplémentaire, outils numériques, b
     arreterCurseurVirtuel();
     livreEnDrag        = null;
     livresDansCartable = [];
-    reponseJoueur      = null;
     secondes           = 0;
     tempsFinale        = 0;
     goTo('accueil');
