@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: innovhandicap
+    runtime: static
+    buildCommand: ""
+    staticPublishPath: .
+    pullRequestPreviewsEnabled: false
+    headers:
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
