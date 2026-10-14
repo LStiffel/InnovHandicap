@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<a href="index.html" style="position:fixed;top:12px;left:12px;z-index:1000;padding:6px 14px;background:#fff;color:#2B2A3D;border:2px solid #2B2A3D;border-radius:999px;box-shadow:3px 3px 0 #2B2A3D;font-family:'Atkinson Hyperlegible',sans-serif;font-size:.9rem;font-weight:700;text-decoration:none;">← Menu</a>
 <div class="sheet">
 
   <header>
@@ -24,7 +25,7 @@
     <h2>🧠 Règle du jeu</h2>
     <p class="tdah-intro-text">
       Des animaux vont apparaître à l'écran. Tu dois cliquer <strong>uniquement sur les crabes</strong> 🦀 pour marquer des points.<br>
-      Mais attention… ton attention va être <em>capturée</em> par des distractions ! Des zooms involontaires vont te détourner de ta tâche.<br><br>
+      Mais attention… ton attention va être <em>capturée</em> par des distractions ! L'écran va zoomer tout seul, des animaux vont changer de couleur… rien de bien méchant, mais essaie de rester concentré sur ta tâche.<br><br>
       <strong>Tu as 30 secondes.</strong> Bonne chance !
     </p>
     <div class="row">
@@ -45,7 +46,6 @@
       </div>
       <div class="tdah-grid" id="tdahGrid">
         <!-- Les animaux apparaissent ici dynamiquement -->
-        <div class="tdah-overlay" id="tdahOverlay"></div>
       </div>
       <div class="tdah-zoom-label" id="tdahZoomLabel"></div>
     </div>
@@ -61,7 +61,7 @@
         <div class="stat"><div class="num" id="statScore">—</div><div class="label">score final</div></div>
       </div>
       <div class="feedback" id="tdahFeedback">
-        Les zooms involontaires t'ont empêché de te concentrer ? C'est exactement ce que vit une personne atteinte de TDAH au quotidien.
+        Un simple zoom ou une couleur qui change a suffi à détourner ton regard ? Pour une personne avec un TDAH, ces petits détails du quotidien captent l'attention de façon beaucoup plus forte.
       </div>
       <div class="row">
         <button class="action ghost" id="tdahReplayBtn">Rejouer ↻</button>
@@ -101,7 +101,7 @@
           <p>
             Une personne avec un TDAH ne choisit pas de ne pas écouter. Son cerveau est 
             littéralement <strong>"capturé"</strong> par les stimuli environnants — exactement 
-            comme les zooms que tu as subis pendant le jeu. L'effort nécessaire pour 
+            comme les zooms et les changements de couleur du jeu : des détails anodins pour la plupart des gens, mais impossibles à ignorer. L'effort nécessaire pour 
             rester concentré est beaucoup plus grand.
           </p>
         </div>

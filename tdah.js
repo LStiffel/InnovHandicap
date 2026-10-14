@@ -6,9 +6,17 @@
 const GAME_DURATION = 30;            // secondes
 const ANIMAL_INTERVAL_MS = 1200;     // apparition d'un animal (ms)
 const ANIMAL_MIN_INTERVAL_MS = 600;  // intervalle minimal en fin de partie
-const DISTRACTION_START = 5;         // début des distractions (s)
-const ZOOM_DURATION_MS = 1800;       // durée d'un zoom de distraction
-const ZOOM_SCALE = 2.8;             // facteur de zoom caméra
+const DISTRACTION_START = 2;         // début des zooms (s)
+const ZOOM_MIN_SCALE = 1.4;          // facteur de zoom caméra (aléatoire entre min et max)
+const ZOOM_MAX_SCALE = 2.3;
+const ZOOM_MIN_MS = 900;             // durée d'un zoom (aléatoire entre min et max)
+const ZOOM_MAX_MS = 1800;
+const COLOR_START = 2;               // début des changements de couleur (s)
+const COLOR_MAX_TARGETS = 3;         // nb max d'émojis recolorés en même temps
+const WANDER_CHANCE = 0.4;           // proportion d'animaux qui se baladent
+const WANDER_MAX_STEP = 110;         // distance max d'un déplacement (px)
+const WANDER_MIN_MS = 900;           // durée d'un déplacement (aléatoire entre min et max)
+const WANDER_MAX_MS = 1500;
 
 const ANIMALS = [
   { emoji: '🦀', name: 'crabe',     isTarget: true  },
@@ -35,6 +43,7 @@ let gameRunning = false;
 let gameTimerInterval = null;
 let animalSpawnInterval = null;
 let distractionTimeout = null;
+let colorTimeout = null;
 let remainingTime = GAME_DURATION;
 let isZooming = false;
 let distractionCount = 0;
@@ -49,7 +58,6 @@ const tdahStartBtn = document.getElementById('tdahStartBtn');
 const tdahStopBtn  = document.getElementById('tdahStopBtn');
 const tdahResults  = document.getElementById('tdahResults');
 const tdahExplan   = document.getElementById('tdahExplanation');
-let   tdahOverlay  = document.getElementById('tdahOverlay');
 const tdahZoomLabel= document.getElementById('tdahZoomLabel');
 const tdahInstructions = document.getElementById('tdahInstructions');
 
@@ -88,17 +96,7 @@ function createAnimalElement(animal) {
   el.setAttribute('aria-label', animal.name);
 
   el.addEventListener('click', () => {
-    if (!gameRunning || isZooming) {
-      // Clic pendant le zoom = malus
-      if (isZooming && gameRunning) {
-        badClicks++;
-        score = Math.max(0, score - 1);
-        updateScoreDisplay();
-        el.classList.add('tdah-animal--malus');
-        setTimeout(() => el.classList.remove('tdah-animal--malus'), 300);
-      }
-      return;
-    }
+    if (!gameRunning) return;
 
     if (animal.isTarget) {
       // Bon clic sur un crabe
@@ -139,13 +137,13 @@ function spawnAnimal() {
   const el = createAnimalElement(animal);
 
   // Position aléatoire dans la grille
-  const arenaRect = tdahGrid.getBoundingClientRect();
-  const maxX = tdahGrid.clientWidth - 60;
-  const maxY = tdahGrid.clientHeight - 60;
-  el.style.left = randomInt(10, Math.max(10, maxX)) + 'px';
-  el.style.top  = randomInt(10, Math.max(10, maxY)) + 'px';
+  const bounds = arenaBounds();
+  el.style.left = randomInt(bounds.minX, bounds.maxX) + 'px';
+  el.style.top  = randomInt(bounds.minY, bounds.maxY) + 'px';
 
   tdahGrid.appendChild(el);
+
+  if (Math.random() < WANDER_CHANCE) wander(el);
 
   // Disparition automatique après un délai
   const elapsed = startTimestamp ? (Date.now() - startTimestamp) / 1000 : 0;
@@ -166,6 +164,37 @@ function spawnAnimal() {
   }, lifetime);
 }
 
+// Zone où un animal reste entièrement visible dans l'arène
+function arenaBounds() {
+  return {
+    minX: 10,
+    minY: 10,
+    maxX: Math.max(10, tdahGrid.clientWidth - 60),
+    maxY: Math.max(10, tdahGrid.clientHeight - 60),
+  };
+}
+
+function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
+
+// Déplacement lent et aléatoire, en restant dans l'arène, jusqu'à disparition
+function wander(el) {
+  if (!gameRunning || !el.isConnected || el.disabled) return;
+
+  const bounds = arenaBounds();
+  const x = clamp(parseFloat(el.style.left) + randomInt(-WANDER_MAX_STEP, WANDER_MAX_STEP), bounds.minX, bounds.maxX);
+  const y = clamp(parseFloat(el.style.top)  + randomInt(-WANDER_MAX_STEP, WANDER_MAX_STEP), bounds.minY, bounds.maxY);
+  const duration = randomInt(WANDER_MIN_MS, WANDER_MAX_MS);
+
+  el.style.transition = 'transform .12s ease, opacity .25s ease, filter .15s ease, '
+    + 'left ' + duration + 'ms ease-in-out, top ' + duration + 'ms ease-in-out';
+  el.style.left = x + 'px';
+  el.style.top  = y + 'px';
+
+  setTimeout(() => wander(el), duration);
+}
+
 function startAnimalSpawner() {
   spawnAnimal();
   const elapsed = startTimestamp ? (Date.now() - startTimestamp) / 1000 : 0;
@@ -177,59 +206,86 @@ function startAnimalSpawner() {
   }, interval);
 }
 
-// ---------- Système de distractions (zoom caméra) ----------
+// ---------- Système de distractions ----------
+// Rien n'est bloqué : le joueur peut toujours cliquer. Ce sont des stimuli
+// anodins (un zoom, une couleur qui change) qui captent le regard malgré lui.
+
+// Progression 0 → 1 sur la durée de la partie
+function gameProgress() {
+  const elapsed = startTimestamp ? (Date.now() - startTimestamp) / 1000 : 0;
+  return Math.min(elapsed / GAME_DURATION, 1);
+}
+
+function randomFloat(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
+// Zoom caméra sur un point aléatoire de l'arène
 function triggerDistraction() {
   if (!gameRunning) return;
 
   isZooming = true;
   distractionCount++;
 
-  const distractor = DISTRACTORS[distractionCount % DISTRACTORS.length];
-
-  // Affiche le label de distraction
+  const distractor = DISTRACTORS[randomInt(0, DISTRACTORS.length - 1)];
   tdahZoomLabel.textContent = distractor.emoji + ' ' + distractor.label;
   tdahZoomLabel.classList.add('visible');
 
-  // Calcul du point de zoom (aléatoire dans l'arène)
-  const offsetX = randomInt(-20, 20);
-  const offsetY = randomInt(-20, 20);
+  const scale = randomFloat(ZOOM_MIN_SCALE, ZOOM_MAX_SCALE);
+  const duration = randomInt(ZOOM_MIN_MS, ZOOM_MAX_MS);
 
-  // Applique le zoom brutal
-  tdahGrid.style.transition = 'transform 200ms ease-in';
-  tdahGrid.style.transform = `scale(${ZOOM_SCALE}) translate(${offsetX}px, ${offsetY}px)`;
-  tdahGrid.classList.add('tdah-grid--zoomed');
+  tdahGrid.style.transformOrigin = randomInt(10, 90) + '% ' + randomInt(10, 90) + '%';
+  tdahGrid.style.transition = 'transform ' + randomInt(150, 400) + 'ms ease-in-out';
+  tdahGrid.style.transform = 'scale(' + scale.toFixed(2) + ')';
 
-  // Overlay semi-opaque pendant le zoom
-  tdahOverlay.classList.add('visible');
-
-  // Dézoom après la durée
   setTimeout(() => {
     if (!gameRunning) return;
     tdahGrid.style.transition = 'transform 350ms ease-out';
-    tdahGrid.style.transform = 'scale(1) translate(0,0)';
-    tdahGrid.classList.remove('tdah-grid--zoomed');
-    tdahOverlay.classList.remove('visible');
+    tdahGrid.style.transform = 'scale(1)';
     tdahZoomLabel.classList.remove('visible');
+    isZooming = false;
+  }, duration);
 
-    setTimeout(() => {
-      isZooming = false;
-    }, 350);
-  }, ZOOM_DURATION_MS);
-
-  // Prochaine distraction (de plus en plus fréquent)
-  scheduleNextDistraction();
+  scheduleNextDistraction(duration);
 }
 
-function scheduleNextDistraction() {
+function scheduleNextDistraction(lastDuration) {
   if (!gameRunning) return;
-  const elapsed = startTimestamp ? (Date.now() - startTimestamp) / 1000 : 0;
-  // Intervalle décroissant : 5s → 2s
-  const baseInterval = Math.max(2000, 5000 - distractionCount * 600);
-  const jitter = randomInt(-500, 500);
+  // Intervalle décroissant : ~2 s → ~0,5 s entre deux zooms
+  const pause = 2000 - gameProgress() * 1500 + randomInt(-300, 300);
 
   distractionTimeout = setTimeout(() => {
     if (gameRunning) triggerDistraction();
-  }, baseInterval + jitter);
+  }, lastDuration + Math.max(300, pause));
+}
+
+// Changement de couleur aléatoire de quelques émojis
+function triggerColorFlicker() {
+  if (!gameRunning) return;
+
+  const animals = Array.from(tdahGrid.querySelectorAll('.tdah-animal:not(:disabled)'));
+  const count = Math.min(animals.length, randomInt(1, 1 + Math.round(gameProgress() * (COLOR_MAX_TARGETS - 1))));
+
+  shuffleArray(animals).slice(0, count).forEach(el => {
+    el.style.filter = 'hue-rotate(' + randomInt(60, 300) + 'deg) saturate(' + randomFloat(1.5, 3).toFixed(1) + ')';
+    el.classList.add('tdah-animal--flicker');
+    setTimeout(() => {
+      el.style.filter = '';
+      el.classList.remove('tdah-animal--flicker');
+    }, randomInt(400, 1200));
+  });
+
+  scheduleNextColorFlicker();
+}
+
+function scheduleNextColorFlicker() {
+  if (!gameRunning) return;
+  // Intervalle décroissant : ~1,8 s → ~0,6 s
+  const interval = 1800 - gameProgress() * 1200 + randomInt(-300, 300);
+
+  colorTimeout = setTimeout(() => {
+    if (gameRunning) triggerColorFlicker();
+  }, Math.max(300, interval));
 }
 
 // ---------- Cycle de vie du jeu ----------
@@ -244,11 +300,8 @@ function initGame() {
   distractionCount = 0;
   startTimestamp = null;
 
-  tdahGrid.innerHTML = '<div class="tdah-overlay" id="tdahOverlay"></div>';
-  tdahOverlay = document.getElementById('tdahOverlay');
-  tdahGrid.style.transform = 'scale(1) translate(0,0)';
-  tdahGrid.classList.remove('tdah-grid--zoomed');
-  tdahOverlay.classList.remove('visible');
+  tdahGrid.innerHTML = '';
+  tdahGrid.style.transform = 'scale(1)';
   tdahZoomLabel.classList.remove('visible');
 
   updateTimerDisplay();
@@ -286,10 +339,13 @@ function startGame() {
   // Spawning d'animaux
   startAnimalSpawner();
 
-  // Distractions après le délai initial
+  // Distractions après les délais initiaux
   distractionTimeout = setTimeout(() => {
     if (gameRunning) triggerDistraction();
   }, DISTRACTION_START * 1000);
+  colorTimeout = setTimeout(() => {
+    if (gameRunning) triggerColorFlicker();
+  }, COLOR_START * 1000);
 }
 
 function endGame() {
@@ -297,12 +353,11 @@ function endGame() {
   clearInterval(gameTimerInterval);
   clearTimeout(animalSpawnInterval);
   clearTimeout(distractionTimeout);
+  clearTimeout(colorTimeout);
 
   isZooming = false;
   tdahGrid.style.transition = 'transform 350ms ease-out';
-  tdahGrid.style.transform = 'scale(1) translate(0,0)';
-  tdahGrid.classList.remove('tdah-grid--zoomed');
-  tdahOverlay.classList.remove('visible');
+  tdahGrid.style.transform = 'scale(1)';
   tdahZoomLabel.classList.remove('visible');
 
   // Afficher résultats

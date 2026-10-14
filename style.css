@@ -228,25 +228,6 @@ margin-top:10px;
   will-change:transform;
   cursor:crosshair;
 }
-.tdah-grid--zoomed{
-  cursor:not-allowed;
-}
-
-/* Overlay de distraction */
-.tdah-overlay{
-  position:absolute;
-  inset:0;
-  background:rgba(43,42,61,.25);
-  pointer-events:none;
-  opacity:0;
-  transition:opacity 200ms ease;
-  border-radius:var(--radius);
-  z-index:10;
-}
-.tdah-overlay.visible{
-  opacity:1;
-}
-
 /* Label du zoom (ex: "Oh, un papillon !") */
 .tdah-zoom-label{
   text-align:center;
@@ -275,7 +256,7 @@ margin-top:10px;
   cursor:pointer;
   padding:6px;
   border-radius:50%;
-  transition:transform .12s ease, opacity .25s ease;
+  transition:transform .12s ease, opacity .25s ease, filter .15s ease;
   animation:tdah-pop-in .25s ease-out;
   z-index:5;
 }
@@ -291,6 +272,9 @@ margin-top:10px;
 .tdah-animal--malus{
   animation:tdah-shake .3s ease;
 }
+.tdah-animal--flicker{
+  animation:tdah-flicker .5s ease-in-out infinite alternate;
+}
 .tdah-animal--missed{
   opacity:.3;
   transform:scale(0.5);
@@ -300,6 +284,10 @@ margin-top:10px;
   0%{ transform:scale(0); opacity:0; }
   60%{ transform:scale(1.15); opacity:1; }
   100%{ transform:scale(1); opacity:1; }
+}
+@keyframes tdah-flicker{
+  from{ transform:scale(1); }
+  to{ transform:scale(1.2); }
 }
 @keyframes tdah-hit{
   0%{ transform:scale(1); opacity:1; }
