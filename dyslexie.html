@@ -6,6 +6,7 @@
 <title>Copie Miroir — entraînement clavier</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="explication.css">
 <style>
   :root{
     --paper:#FBF6EC;
@@ -78,8 +79,10 @@
     font-size:.85rem;
     font-weight:700;
     background:#fff;
-    cursor:pointer;
     transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .chip.done{
+    background:var(--correct-bg);
   }
   .chip.active{
     background:var(--ink);
@@ -152,7 +155,9 @@
     align-items:center;
   }
 
-  button.action{
+  .action{
+    display:inline-block;
+    text-decoration:none;
     border:2px solid var(--ink);
     background:var(--gold);
     color:var(--ink);
@@ -164,8 +169,9 @@
     box-shadow:3px 3px 0 var(--ink);
     transition:transform .1s ease, box-shadow .1s ease;
   }
-  button.action:hover{ transform:translate(1px,1px); box-shadow:2px 2px 0 var(--ink); }
-  button.action.ghost{ background:#fff; }
+  .action:hover{ transform:translate(1px,1px); box-shadow:2px 2px 0 var(--ink); }
+  .action.ghost{ background:#fff; }
+  .action[hidden]{ display:none; }
 
   .timerline{
     font-family:'Caveat', cursive;
@@ -223,6 +229,8 @@
 
   <div class="legend" id="legend"></div>
 
+  <!-- ===== JEU ===== -->
+  <div id="gameScreen">
   <div class="card">
     <h2 id="levelTitle">Niveau 1 — mini-confusions</h2>
     <div class="target" id="target"></div>
@@ -246,9 +254,78 @@
       <div class="stat"><div class="num" id="statAcc">—</div><div class="label">précision des fautes</div></div>
       <div class="stat"><div class="num" id="statWpm">—</div><div class="label">mots / min</div></div>
     </div>
+    <div class="row">
+      <button class="action" id="nextLevelBtn" hidden>Niveau suivant →</button>
+    </div>
   </div>
 
   <footer>Astuce&nbsp;: les mots soulignés en vague rouge contiennent une faute volontaire — ne les corrige pas !</footer>
+  </div>
+
+  <!-- ===== RÉSULTATS & FICHE PÉDAGOGIQUE ===== -->
+  <div id="endScreen" style="display:none;">
+    <div class="card">
+      <h2>Résultats de la partie</h2>
+      <div class="stats">
+        <div class="stat"><div class="num" id="endTime">—</div><div class="label">secondes au total</div></div>
+        <div class="stat"><div class="num" id="endAcc">—</div><div class="label">précision moyenne</div></div>
+        <div class="stat"><div class="num" id="endTraps">—</div><div class="label">fautes conservées</div></div>
+      </div>
+      <div class="feedback" id="endFeedback"></div>
+    </div>
+
+    <div class="card">
+      <h2>📖 Qu'est-ce que la dyslexie ?</h2>
+      <div class="expl-content">
+        <div class="expl-block">
+          <h3>Définition</h3>
+          <p>
+            La <strong>dyslexie</strong> est un <strong>trouble du neurodéveloppement</strong> qui affecte
+            durablement l'apprentissage de la lecture : le cerveau a du mal à associer rapidement les lettres
+            aux sons et à reconnaître les mots de façon automatique. Elle s'accompagne souvent d'une
+            <strong>dysorthographie</strong> (difficulté à écrire les mots correctement).
+          </p>
+        </div>
+
+        <div class="expl-block">
+          <h3>📊 Chiffres clés</h3>
+          <ul>
+            <li><strong>5 à 8 %</strong> des enfants sont concernés, soit un à deux élèves par classe</li>
+            <li>C'est le plus fréquent des <strong>troubles « dys »</strong></li>
+            <li>Elle <strong>persiste à l'âge adulte</strong> : on apprend à compenser, on ne « guérit » pas</li>
+          </ul>
+        </div>
+
+        <div class="expl-block">
+          <h3>💡 Ce qu'il faut retenir</h3>
+          <p class="expl-quote">
+            « Ce n'est pas de la paresse, c'est un cerveau pour qui chaque mot doit être déchiffré. »
+          </p>
+          <p>
+            Là où un bon lecteur reconnaît un mot d'un coup d'œil, une personne dyslexique doit souvent le
+            <strong>décoder lettre par lettre</strong>. Les lettres proches (<strong>b/d</strong>, <strong>p/q</strong>)
+            s'inversent, les sons proches se confondent (<strong>ph/f</strong>, <strong>gue/ge</strong>) —
+            exactement les pièges du jeu. Recopier un texte devient lent et épuisant, et cela n'a
+            <strong>aucun lien avec l'intelligence</strong>.
+          </p>
+        </div>
+
+        <div class="expl-block">
+          <h3>🤝 Comment aider ?</h3>
+          <ul>
+            <li>Laisser plus de temps et ne pas pénaliser l'orthographe à chaque exercice</li>
+            <li>Utiliser une police lisible, des textes aérés et des caractères plus grands</li>
+            <li>Lire les consignes à voix haute et privilégier l'oral</li>
+            <li>Proposer des outils numériques (synthèse vocale, correcteur)</li>
+          </ul>
+        </div>
+      </div>
+      <div class="row">
+        <button class="action ghost" id="replayBtn">Rejouer ↻</button>
+        <a href="index.html" class="action">Retour au menu</a>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -303,6 +380,7 @@ let targetPlain = "";       // texte cible exact à retrouver (sans les marqueur
 let traps = [];             // liste {word, start, end, hint}
 let startTime = null;
 let finished = false;
+let results = [];           // résultat de chaque niveau : {time, accuracy, trapsKept, trapsTotal}
 
 const legendEl = document.getElementById('legend');
 const levelTitleEl = document.getElementById('levelTitle');
@@ -313,16 +391,18 @@ const feedbackEl = document.getElementById('feedback');
 const statTime = document.getElementById('statTime');
 const statAcc = document.getElementById('statAcc');
 const statWpm = document.getElementById('statWpm');
+const nextLevelBtn = document.getElementById('nextLevelBtn');
+const gameScreen = document.getElementById('gameScreen');
+const endScreen = document.getElementById('endScreen');
 
 let timerInterval = null;
 
 function buildLegend(){
   legendEl.innerHTML = "";
   LEVELS.forEach((lvl, i) => {
-    const chip = document.createElement('button');
-    chip.className = 'chip' + (i === levelIndex ? ' active' : '');
+    const chip = document.createElement('span');
+    chip.className = 'chip' + (i === levelIndex ? ' active' : '') + (i < levelIndex ? ' done' : '');
     chip.textContent = (i+1) + ". " + lvl.types.join(' · ');
-    chip.onclick = () => { levelIndex = i; pickSentence(); };
     legendEl.appendChild(chip);
   });
 }
@@ -364,6 +444,7 @@ function pickSentence(){
   typebox.classList.remove('locked');
   typebox.disabled = false;
   feedbackEl.textContent = "";
+  nextLevelBtn.hidden = true;
   statTime.textContent = "—"; statAcc.textContent = "—"; statWpm.textContent = "—";
   statAcc.classList.remove('bad'); statWpm.classList.remove('bad');
   renderTarget("");
@@ -444,6 +525,52 @@ function finishRound(){
   feedbackEl.textContent = accuracy === 100
     ? "Texte recopié à l'identique, fautes comprises. " + trapMsg
     : "Compare les zones colorées ci-dessus pour repérer les écarts. " + trapMsg;
+
+  results[levelIndex] = { time: elapsedSec, accuracy, trapsKept, trapsTotal: traps.length };
+  nextLevelBtn.textContent = levelIndex < LEVELS.length - 1 ? "Niveau suivant →" : "Voir le bilan →";
+  nextLevelBtn.hidden = false;
+}
+
+function nextLevel(){
+  if (levelIndex < LEVELS.length - 1){
+    levelIndex++;
+    pickSentence();
+  } else {
+    showEnd();
+  }
+}
+
+function showEnd(){
+  gameScreen.style.display = 'none';
+  legendEl.style.display = 'none';
+  endScreen.style.display = 'block';
+
+  const totalTime = results.reduce((sum, r) => sum + r.time, 0);
+  const avgAcc = Math.round(results.reduce((sum, r) => sum + r.accuracy, 0) / results.length);
+  const kept = results.reduce((sum, r) => sum + r.trapsKept, 0);
+  const total = results.reduce((sum, r) => sum + r.trapsTotal, 0);
+
+  document.getElementById('endTime').textContent = totalTime.toFixed(1);
+  const endAcc = document.getElementById('endAcc');
+  endAcc.textContent = avgAcc + "%";
+  endAcc.classList.toggle('bad', avgAcc < 70);
+  const endTraps = document.getElementById('endTraps');
+  endTraps.textContent = kept + "/" + total;
+  endTraps.classList.toggle('bad', kept < total);
+
+  document.getElementById('endFeedback').textContent = kept < total
+    ? "Ton cerveau a « corrigé » certaines fautes sans te demander ton avis : il lit les mots en entier, par automatisme. Une personne dyslexique n'a pas cet automatisme — chaque mot se déchiffre, et chaque lettre peut piéger."
+    : "Tu as recopié toutes les fautes volontaires, mais au prix d'une attention de chaque instant. C'est cet effort, à chaque ligne, que vit une personne dyslexique.";
+  window.scrollTo(0, 0);
+}
+
+function restart(){
+  levelIndex = 0;
+  results = [];
+  endScreen.style.display = 'none';
+  gameScreen.style.display = '';
+  legendEl.style.display = '';
+  pickSentence();
 }
 
 typebox.addEventListener('input', () => {
@@ -460,6 +587,8 @@ typebox.addEventListener('keydown', (e) => {
 
 document.getElementById('validateBtn').onclick = finishRound;
 document.getElementById('nextBtn').onclick = pickSentence;
+nextLevelBtn.onclick = nextLevel;
+document.getElementById('replayBtn').onclick = restart;
 
 pickSentence();
 </script>

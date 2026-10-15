@@ -314,25 +314,6 @@ function rejouer() {
   afficherEcran('ecran-accueil');
 }
 
-/* ----------------------------------------------------------------
-   Partager
----------------------------------------------------------------- */
-function partager() {
-  const score = (etatJeu.scoreN1 ? 1 : 0) + (etatJeu.scoreN1b ? 1 : 0) + (etatJeu.scoreN3 ? 1 : 0);
-  const texte = `🎮 J'ai testé "Dans la peau d'un daltonien" et j'ai obtenu ${score}/3 ! `
-              + `Deutéranopie, protanopie, combiné… trois niveaux de confusions chromatiques. `
-              + `#Accessibilité #Daltonisme #InnnovHandicap`;
-
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(texte).then(() => {
-      document.getElementById('msg-partage').textContent = '✅ Message copié dans le presse-papier !';
-      setTimeout(() => { document.getElementById('msg-partage').textContent = ''; }, 3000);
-    });
-  } else {
-    document.getElementById('msg-partage').textContent = '⚠️ Copie non supportée — partagez manuellement.';
-  }
-}
-
 /* ================================================================
    UTILITAIRE : créer un fil HTML
 ================================================================ */

@@ -6,6 +6,7 @@
   <title>Dans la Peau d'un Dyspraxique</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="explication.css">
   <style>
 
     :root {
@@ -390,18 +391,6 @@
       font-family: 'Atkinson Hyperlegible', sans-serif;
     }
 
-    .explication-texte {
-      font-size: 1rem;
-      line-height: 1.7;
-      white-space: pre-line;
-    }
-
-    .explication-source {
-      margin-top: 12px;
-      font-size: .85rem;
-      color: var(--ink-soft);
-      font-style: italic;
-    }
 
     /* ================================================
        RESPONSIVE
@@ -522,9 +511,51 @@
       </div>
 
       <div class="card">
-        <h2>🤲 La dyspraxie, c'est quoi ?</h2>
-        <p class="explication-texte" id="explication-texte"></p>
-        <p class="explication-source" id="explication-source-texte"></p>
+        <h2>🤲 Qu'est-ce que la dyspraxie ?</h2>
+        <div class="expl-content">
+          <div class="expl-block">
+            <h3>Définition</h3>
+            <p>
+              La <strong>dyspraxie</strong> (officiellement <strong>Trouble Développemental de la Coordination</strong>, TDC)
+              est un <strong>trouble du neurodéveloppement</strong>. Elle affecte la planification, la coordination
+              et l'exécution des gestes volontaires : écrire, s'habiller, ranger ses affaires, faire du sport…
+            </p>
+          </div>
+
+          <div class="expl-block">
+            <h3>📊 Chiffres clés</h3>
+            <ul>
+              <li><strong>5 à 6 %</strong> des enfants sont concernés, soit environ un élève par classe</li>
+              <li>Les garçons sont <strong>2 à 3 fois plus souvent</strong> diagnostiqués que les filles</li>
+              <li>Elle est souvent <strong>associée à d'autres troubles</strong> (dyslexie, TDAH)</li>
+            </ul>
+          </div>
+
+          <div class="expl-block">
+            <h3>💡 Ce qu'il faut retenir</h3>
+            <p class="expl-quote">
+              « Ce n'est pas de la maladresse, c'est un cerveau pour qui chaque geste doit être pensé. »
+            </p>
+            <p>
+              Là où la plupart des gens agissent en <strong>pilote automatique</strong>, une personne dyspraxique
+              doit contrôler consciemment chaque mouvement — exactement comme toi pour attraper et ranger les
+              bons livres dans le jeu. Elle n'a <strong>aucun lien avec l'intelligence</strong> : on peut être
+              brillant et trouver épuisant d'écrire une page.
+            </p>
+          </div>
+
+          <div class="expl-block">
+            <h3>🤝 Comment aider ?</h3>
+            <ul>
+              <li>Accorder du temps supplémentaire</li>
+              <li>Proposer des outils numériques (ordinateur, photocopies des cours)</li>
+              <li>Limiter l'écriture manuscrite et privilégier l'oral</li>
+              <li>Faire preuve de bienveillance face aux gestes maladroits</li>
+            </ul>
+          </div>
+
+          <p class="expl-source">Source : Fédération Française des DYS (ffdys.com) — Inserm 2023</p>
+        </div>
         <div class="row">
           <button class="action ghost" onclick="rejouer()">Rejouer ↻</button>
           <a href="index.html" class="action">Retour au menu</a>
@@ -559,13 +590,6 @@
   const SCORE_TEMPS_MAX      = 1000;
   const PENALITE_PAR_SECONDE = 12;
 
-  const EXPLICATION_TROUBLE = `La dyspraxie (officiellement appelée Trouble Développemental de la Coordination – TDC) est un trouble neurologique qui affecte la planification, la coordination et l'exécution des gestes intentionnels.
-
-Contrairement à ce qu'on pourrait croire, elle n'a aucun lien avec l'intelligence. Une personne dyspraxique peut être brillante intellectuellement tout en trouvant épuisant d'écrire, de s'habiller, de ranger ses affaires ou de pratiquer un sport.
-
-Avec des aménagements adaptés — temps supplémentaire, outils numériques, bienveillance du corps enseignant — les élèves dyspraxiques peuvent pleinement réussir leur scolarité et s'épanouir.`;
-
-  const EXPLICATION_SOURCE = "Source : Fédération Française des DYS (ffdys.com) — Inserm 2023";
 
   /* ======================================================
      PARAMÈTRES CURSEUR VIRTUEL  ← modifie ici
@@ -986,8 +1010,6 @@ Avec des aménagements adaptés — temps supplémentaire, outils numériques, b
     const ss = String(tempsFinale % 60).padStart(2, '0');
     document.getElementById('score-temps-display').textContent          = mm + ':' + ss;
 
-    document.getElementById('explication-texte').textContent        = EXPLICATION_TROUBLE;
-    document.getElementById('explication-source-texte').textContent = EXPLICATION_SOURCE;
 
     const feedback = document.getElementById('score-feedback');
     if (partieArretee) {

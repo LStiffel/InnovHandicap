@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Atkinson+Hyperlegible&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="../explication.css" />
 </head>
 <body>
 <a href="../index.html" style="position:fixed;top:12px;left:12px;z-index:1000;padding:6px 14px;background:#fff;color:#2B2A3D;border:2px solid #2B2A3D;border-radius:999px;box-shadow:3px 3px 0 #2B2A3D;font-family:'Atkinson Hyperlegible',sans-serif;font-size:.9rem;font-weight:700;text-decoration:none;">← Menu</a>
@@ -230,35 +231,59 @@
       <p id="score-message" style="color:var(--ink-soft);font-size:0.9rem;margin-top:8px;"></p>
     </div>
 
-    <div class="encart-info" style="text-align:left;">
-      <h3>🎨 Ce que vous avez vraiment vécu</h3>
-      <p style="margin-top:8px;font-size:0.9rem;">
-        Vous avez simulé le <strong>daltonisme</strong> — une déficience de la perception des couleurs.<br><br>
-        Niveau 1 → <strong>Deutéranopie</strong> : les cônes M (verts) sont absents.
-        Rouge et vert deviennent une même teinte brun-olive.<br>
-        Niveau 2 → <strong>Protanopie</strong> : les cônes L (rouges) sont absents.
-        Le rouge disparaît presque, l'orange se confond avec le vert.<br>
-        Niveau 3 → <strong>Les deux simultanément</strong> : presque toutes les teintes se ressemblent.<br><br>
-        <strong style="color:var(--lilac);">~8% des hommes</strong> vivent cela chaque jour,
-        sans filtre, sans chrono — mais avec des enjeux réels.
-      </p>
-    </div>
+    <div class="carte">
+      <h2>👁️ Qu'est-ce que le daltonisme ?</h2>
+      <div class="expl-content">
+        <div class="expl-block">
+          <h3>Définition</h3>
+          <p>
+            Le <strong>daltonisme</strong> est une <strong>anomalie de la vision des couleurs</strong>,
+            le plus souvent <strong>génétique</strong>. Un ou plusieurs types de cônes de la rétine
+            fonctionnent mal ou sont absents, ce qui rend certaines couleurs difficiles, voire
+            impossibles, à distinguer.
+          </p>
+        </div>
 
-    <div class="encart-info" style="text-align:left;">
-      <h3>💡 Bonnes pratiques d'accessibilité</h3>
-      <ul style="margin-top:8px;padding-left:18px;font-size:0.88rem;line-height:1.8;">
-        <li>Toujours associer couleur <em>et</em> forme ou texte</li>
-        <li>Utiliser des motifs / hachures en complément</li>
-        <li>Éviter les interfaces rouge/vert sans autre marqueur</li>
-        <li>Tester ses interfaces avec des simulateurs (ex. Coblis)</li>
-      </ul>
+        <div class="expl-block">
+          <h3>📊 Chiffres clés</h3>
+          <ul>
+            <li><strong>8 %</strong> des hommes sont concernés, contre <strong>0,5 %</strong> des femmes</li>
+            <li>Environ <strong>un garçon par classe</strong> est daltonien</li>
+            <li>La confusion <strong>rouge / vert</strong> est de loin la forme la plus fréquente</li>
+          </ul>
+        </div>
+
+        <div class="expl-block">
+          <h3>💡 Ce qu'il faut retenir</h3>
+          <p class="expl-quote">
+            « Ce n'est pas un manque d'attention, c'est un œil qui ne reçoit pas les mêmes couleurs. »
+          </p>
+          <p>
+            Une personne daltonienne ne voit pas « en noir et blanc » : certaines teintes se
+            <strong>confondent</strong> — exactement comme les fils de la bombe. Au niveau 1
+            (<strong>deutéranopie</strong>, cônes verts absents), rouge et vert deviennent un même
+            brun-olive ; au niveau 2 (<strong>protanopie</strong>, cônes rouges absents), le rouge
+            s'assombrit et l'orange se confond avec le vert. Feux, graphiques, cartes, codes couleur
+            en classe : sans autre repère, l'erreur est inévitable.
+          </p>
+        </div>
+
+        <div class="expl-block">
+          <h3>🤝 Comment aider ?</h3>
+          <ul>
+            <li>Toujours associer couleur <em>et</em> forme, texte ou motif</li>
+            <li>Éviter les codes uniquement rouge / vert</li>
+            <li>Nommer les couleurs à l'oral plutôt que de dire « le rouge »</li>
+            <li>Tester ses supports avec un simulateur (ex. Coblis)</li>
+          </ul>
+        </div>
+      </div>
     </div>
 
     <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
       <button class="btn btn-secondaire" onclick="rejouer()">🔄 Rejouer</button>
-      <button class="btn btn-neutre" onclick="partager()">📤 Partager</button>
+      <a href="../index.html" class="btn btn-neutre" style="text-decoration:none;display:inline-block;">Retour au menu</a>
     </div>
-    <p id="msg-partage" style="font-size:0.8rem;color:var(--moss);min-height:18px;"></p>
   </div>
 
 </div><!-- #app -->

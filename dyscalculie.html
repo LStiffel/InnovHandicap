@@ -5,7 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vivre la Dyscalculie</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="tempstyle.css">
+<link rel="stylesheet" href="explication.css">
 </head>
 <body>
 <a href="index.html" style="position:fixed;top:12px;left:12px;z-index:1000;padding:6px 14px;background:#fff;color:#2B2A3D;border:2px solid #2B2A3D;border-radius:999px;box-shadow:3px 3px 0 #2B2A3D;font-family:'Atkinson Hyperlegible',sans-serif;font-size:.9rem;font-weight:700;text-decoration:none;">← Menu</a>
@@ -182,10 +184,53 @@
       <span class="game-title-bar">🧠 Ce que vous avez vécu</span>
     </div>
     <div class="bilan-box">
-      <p>La <strong>dyscalculie</strong> est un trouble neurodéveloppemental spécifique qui affecte la capacité à traiter et manipuler les nombres. Elle touche :</p>
-      <p>— L'<strong>automatisation des symboles numériques</strong> (jeu 1) : les chiffres arabes ne deviennent jamais "évidents", chaque lecture coûte un effort cognitif.</p>
-      <p>— Le <strong>subitizing</strong> (jeu 2) : la perception instantanée des petites quantités est absente ou très déficiente, forçant un comptage un par un même pour 3 objets.</p>
-      <p style="margin-top:8px;">Ce n'est <em>pas</em> un manque de travail ou d'intelligence. C'est un fonctionnement neurologique différent, permanent, qui demande des adaptations pédagogiques spécifiques.</p>
+      <h2 style="margin-bottom:16px;">🔢 Qu'est-ce que la dyscalculie ?</h2>
+      <div class="expl-content">
+        <div class="expl-block">
+          <h3>Définition</h3>
+          <p>
+            La <strong>dyscalculie</strong> est un <strong>trouble du neurodéveloppement</strong>
+            qui affecte durablement la capacité à comprendre, traiter et manipuler les nombres :
+            reconnaître les chiffres, estimer des quantités, mémoriser les tables ou poser un calcul.
+          </p>
+        </div>
+
+        <div class="expl-block">
+          <h3>📊 Chiffres clés</h3>
+          <ul>
+            <li><strong>3 à 7 %</strong> des enfants sont concernés, soit environ un élève par classe</li>
+            <li>Elle touche <strong>autant les filles que les garçons</strong></li>
+            <li>Elle est souvent <strong>associée à d'autres troubles</strong> (dyslexie, TDAH) et reste moins connue qu'eux</li>
+          </ul>
+        </div>
+
+        <div class="expl-block">
+          <h3>💡 Ce qu'il faut retenir</h3>
+          <p class="expl-quote">
+            « Ce n'est pas être nul en maths, c'est un cerveau pour qui les nombres ne parlent pas d'eux-mêmes. »
+          </p>
+          <p>
+            Pour un élève dyscalculique, <strong>les chiffres ne s'automatisent pas</strong> : chaque symbole
+            demande un effort de décodage, exactement comme les glyphes du jeu 1. Et la
+            <strong>perception instantanée des petites quantités</strong> (le <em>subitizing</em>, jeu 2)
+            fait défaut : il faut compter un par un, même pour 3 objets.
+          </p>
+          <p>
+            Ce n'est ni un manque de travail ni un manque d'intelligence, mais un fonctionnement
+            neurologique différent et permanent.
+          </p>
+        </div>
+
+        <div class="expl-block">
+          <h3>🤝 Comment aider ?</h3>
+          <ul>
+            <li>Autoriser la calculatrice et les tables affichées</li>
+            <li>Utiliser du matériel concret et des supports visuels</li>
+            <li>Laisser plus de temps et ne pas pénaliser les erreurs de calcul</li>
+            <li>Valoriser le raisonnement plutôt que la vitesse</li>
+          </ul>
+        </div>
+      </div>
       <div style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap;">
         <button class="btn-primary" onclick="goHome()">← Accueil</button>
         <button class="btn-ghost" onclick="g2Restart()">Rejouer le jeu 2</button>
